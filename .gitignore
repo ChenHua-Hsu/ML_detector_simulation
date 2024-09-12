@@ -5,3 +5,6 @@
 test/
 wandb/
 datasets_new/
+datasets/dataset_2_padded_rtheta_new_transformation_nentry1033To1161.pt
+datasets/dataset_2_padded_rtheta_new_transformation_nentry1033To1161_preprocessor.pkl
+datasets/input_dists_transformed.png
