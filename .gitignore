@@ -1,0 +1,6 @@
+/sampling_result/
+/training_result/
+/fulldataset/
+/fulldataset_test/
+test/
+wandb/
