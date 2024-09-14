@@ -1,3 +1,4 @@
+# change line248,608, convertor199, display_remove_tail 156,1052, yml file
 import time, functools, torch, os, sys, random, fnmatch, psutil, argparse, tqdm, yaml
 from datetime import datetime
 import matplotlib
@@ -14,7 +15,6 @@ plt.rcParams['mathtext.fontset'] = 'cm'
 from prettytable import PrettyTable
 torch.manual_seed(1234)
 np.random.seed(1234)
-
 # Pytorch libs
 import torch.nn as nn
 import torch.nn.functional as F
@@ -36,7 +36,7 @@ sys.path.insert(2, 'toy_model')
 import data_utils as utils
 import score_model as score_model
 import sdes as sdes
-import display_test1 as display 
+import display_remove_tail as display 
 import samplers as samplers
 import Convertor as Convertor
 from Convertor import Preprocessor
@@ -244,7 +244,7 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
     
     n_files = len(files_list_)
     print(f'n_files: {n_files}')
-    nshowers_per_file = [2,2]#[1311,6685,774,613,615,2]
+    nshowers_per_file = [613]
     #r_ = config.n_showers_2_gen % nshowers_per_file[0]
     #nshowers_per_file[-1] = nshowers_per_file[-1]+r_
     shower_counter = 0
@@ -604,7 +604,7 @@ def main(config=None):
     files_list_ = []
     print(f'Training files found in: {training_file_path}')
     for filename in os.listdir(training_file_path):
-        if fnmatch.fnmatch(filename, 'dataset_2_padded_transform_incident_later_nentry130To258.pt') or fnmatch.fnmatch(filename, 'dataset_2_padded_transform_incident_later_nentry1033To1161.pt'):
+        if fnmatch.fnmatch(filename, 'dataset_2_padded_transform_incident_later_nentry3097To3225.pt'):
             files_list_.append(os.path.join(training_file_path,filename))
     print(f'Files: {files_list_}')
     
@@ -712,7 +712,7 @@ def main(config=None):
             # n.b. you'll need to make sure the config hyperparams are the same as the model being used
             else:
 #                trained_model_name = 'training_20240408_1350_output/ckpt_tmp_299.pth'
-                trained_model_name = '/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/training_result/training_20240825_1722_output/ckpt_tmp_199.pth'
+                trained_model_name = '/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/training_result/training_epoch_1000_different_shower20240901_1209_output/ckpt_tmp_999.pth'
                 output_directory = generate(files_list_, load_filename=trained_model_name, device=device)
             
 
@@ -890,22 +890,48 @@ def main(config=None):
                 output_file = os.path.join(output_directory, f'Reference_{i}.h5')
                 Geant4_files.append(output_file)
                 converter.to_h5py(output_file)
+            
+            import h5py
+
+            output_file = os.path.join(output_directory, f'combined_Geant4.h5')
+
+            # Open a new HDF5 file to collect all datasets from Geant4_files
+            with h5py.File(output_file, 'w') as h5_out:
+                combined_showers = []
+                combined_energies = []
+
+                for file_idx, h5_file in enumerate(Geant4_files):
+                    with h5py.File(h5_file, 'r') as h5_in:
+                        # Accumulate all showers and incident_energies datasets
+                        combined_showers.append(h5_in['showers'][:])
+                        combined_energies.append(h5_in['incident_energies'][:])
+
+                # Concatenate all the collected data
+                combined_showers = np.concatenate(combined_showers, axis=0)
+                combined_energies = np.concatenate(combined_energies, axis=0)
+
+                # Create datasets in the output file
+                h5_out.create_dataset('showers', data=combined_showers)
+                h5_out.create_dataset('incident_energies', data=combined_energies)
+
+            print(f"All files have been combined into {output_file}")
 
    
-            os.system('python3 util/evaluate_image_based.py -m all --output_dir {outdir} --input_file {Gen_file} --reference_file {Geant4_file} --dataset 2'.format(Gen_file = os.path.join(output_directory, 'Gen.h5'), Geant4_file = os.path.join(output_directory, 'Reference_0.h5'), outdir = os.path.join(output_directory, 'calo_score')))
-            #wandb.log({"summary" : wandb.Image(os.path.join(output_directory, 'calo_score', 'reference_average_shower_dataset_2.png'))})
-            wandb.log({"summary" : wandb.Image(os.path.join(output_directory, 'calo_score', 'average_shower_dataset_2.png'))})
+            
             Gen_file = os.path.join(output_directory, 'Gen.h5')
             Geant4_file = os.path.join(output_directory, 'Reference.h5')
             plot = display.High_class_feature_plot_test(Gen_file,Geant4_files,output_directory)
             plot_energy_r_plt = plot.plot_energy_r()
-            #plot_energy_z_plt = plot.plot_energy_z()
-            #r_width_plt = plot.r_width()
-            #max_voxel_dep_energy_layer_plt = plot.max_voxel_dep_energy_layer()
+            plot_energy_z_plt = plot.plot_energy_z()
+            r_width_plt = plot.r_width()
+            max_voxel_dep_energy_layer_plt = plot.max_voxel_dep_energy_layer()
             wandb.log({"summary" : wandb.Image(plot_energy_r_plt)})
-            #wandb.log({"summary" : wandb.Image(plot_energy_z_plt)})
-            #wandb.log({"summary" : wandb.Image(r_width_plt)})
-            #wandb.log({"summary" : wandb.Image(max_voxel_dep_energy_layer_plt)}) 
+            wandb.log({"summary" : wandb.Image(plot_energy_z_plt)})
+            wandb.log({"summary" : wandb.Image(r_width_plt)})
+            wandb.log({"summary" : wandb.Image(max_voxel_dep_energy_layer_plt)}) 
+            os.system('python3 util/evaluate_image_based.py -m all --output_dir {outdir} --input_file {Gen_file} --reference_file {Geant4_file} --dataset 2'.format(Gen_file = os.path.join(output_directory, 'Gen.h5'), Geant4_file = os.path.join(output_directory, 'Reference_0.h5'), outdir = os.path.join(output_directory, 'calo_score')))
+            wandb.log({"summary" : wandb.Image(os.path.join(output_directory, 'calo_score', 'reference_average_shower_dataset_2.png'))})
+            wandb.log({"summary" : wandb.Image(os.path.join(output_directory, 'calo_score', 'average_shower_dataset_2.png'))})
             wandb.log({"summary":  wandb.Image(os.path.join(output_directory, 'calo_score', 'voxel_energy_dataset_2.png'))})
    
             # os.system('python3 util/evaluate_image_based.py -m all --output_dir {outdir} --input_file {Gen_file} --reference_file {Geant4_file} --dataset 2'.format(Gen_file = os.path.join(output_directory, 'Gen.h5'), Geant4_file = os.path.join(output_directory, 'Reference.h5'), outdir = os.path.join(output_directory, 'calo_score')))
@@ -965,7 +991,7 @@ if __name__=='__main__':
     # Run main function using sweep agents reading from configs
     # Sweeps run by setting range of parameter values to explore, else set single parameter value
     # Running from yaml files facilitates submitting (several) jobs to condor
-      n_runs = 5
+      n_runs = 2
       sweep_id = wandb.sweep(sweep_yml, project="NCSM-"+project_name)
       wandb.agent(sweep_id, main, count=n_runs)
     
