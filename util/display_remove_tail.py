@@ -153,7 +153,7 @@ def plot_distribution(files_:Union[ list , utils.cloud_dataset], nshowers_2_plot
         # Using several files so want to take even # samples from each file for plots
         n_files = len(files_)
         print(f'# files: {n_files}')
-        nshowers_per_file = [1311,6685,774,613,615,2]
+        nshowers_per_file = [615] #[1311,6685,774,613,615,2]
         #r_ = nshowers_2_plot % nshowers_per_file[0]
         #nshowers_per_file[-1] = nshowers_per_file[-1]+r_
         print(f'# showers per file: {nshowers_per_file}')
@@ -742,27 +742,28 @@ def comparison_summary(dists, dists_gen, sampling_directory, erange=(), xrange=(
     # # Filter data
     # filtered_data = all_e_gen[(all_e_gen >= negative_cutoff_value) & (all_e_gen <= positive_cutoff_value)]
     # all_e_gen = filtered_data 
-    counts, bin_edges = np.histogram(all_e_gen, bins=100)
-    print(counts)
-    count_max = np.max(counts)
+    # counts, bin_edges = np.histogram(all_e_gen, bins=100)
+    # print(counts)
+    # count_max = np.max(counts)
 
-    # Find the cutoff index for the positive side
-    min = 0
-    max = 0
-    negative = 0
-    for i in range(len(counts)-1):
+    # # Find the cutoff index for the positive side
+    # min = 0
+    # max = 0
+    # negative = 0
+    # for i in range(len(counts)-1):
         
         
-        if counts[i] < count_max * 1e-4 and counts[i+1] > count_max * 1e-4 and negative == 0:
-            negative = 1
-            min = bin_edges[i]
-        if counts[i] > count_max * 1e-4 and counts[i+1] < count_max * 1e-4 and negative == 1:
-            #negative = 0
-            max = bin_edges[i+1]
-            break
-    #index = np.where( counts <= count_max* 0.2)
-    filtered_indices = np.where(counts >= count_max * 0.05)
-    all_e_gen = all_e_gen[(all_e_gen >= min) & (all_e_gen <= max)]
+    #     if counts[i] < count_max * 1e-4 and counts[i+1] > count_max * 1e-4 and negative == 0:
+    #         negative = 1
+    #         min = bin_edges[i]
+    #     if counts[i] > count_max * 1e-4 and counts[i+1] < count_max * 1e-4 and negative == 1:
+    #         #negative = 0
+    #         max = bin_edges[i+1]
+    #         break
+    # #index = np.where( counts <= count_max* 0.2)
+    # filtered_indices = np.where(counts >= count_max * 0.05)
+    #all_e_gen = all_e_gen[(all_e_gen >= min) & (all_e_gen <= max)]
+    all_e_gen = all_e_gen[(all_e_gen >= -15.) & (all_e_gen <= 0.)]
 
     
 
@@ -1049,7 +1050,7 @@ class High_class_feature_plot_test:
         self.shower_nums = []
 
         i = 0 
-        self.batches = [1311,6685,774,613,615,2]#[1311,615,613,774,6685,2]#[774,613,2,6685,615,1311]
+        self.batches = [615] #[1311,6685,774,613,615,2]#[1311,615,613,774,6685,2]#[774,613,2,6685,615,1311]
         # Load and concatenate all reference files, and keep track of shower counts
         for ref_file in reference_files:
             print(ref_file)
