@@ -94,7 +94,7 @@ class Preprocessor:
       return new_E, new_X, new_Y, new_Z
 
     def inverse_transform_hit(self, E,X,Y,Z, incident_energy, padding_value, new_padding_value):
-      mask = (E == padding_value) & (E <= -15.0) & (E >= 0.)
+      mask = (E == padding_value) #& (E <= -15.0) & (E >= 0.)
       new_E = self.inverse_transform_hit_e(E, mask, new_padding_value, incident_energy)
       new_X = self.inverse_transform_hit_xy(X, mask, new_padding_value)
       new_Y = self.inverse_transform_hit_xy(Y, mask, new_padding_value)
