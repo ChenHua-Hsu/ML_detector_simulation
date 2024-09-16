@@ -244,7 +244,7 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
     
     n_files = len(files_list_)
     print(f'n_files: {n_files}')
-    nshowers_per_file = [613]
+    nshowers_per_file = [1311,6685,774,613,615]
     #r_ = config.n_showers_2_gen % nshowers_per_file[0]
     #nshowers_per_file[-1] = nshowers_per_file[-1]+r_
     shower_counter = 0
@@ -604,7 +604,7 @@ def main(config=None):
     files_list_ = []
     print(f'Training files found in: {training_file_path}')
     for filename in os.listdir(training_file_path):
-        if fnmatch.fnmatch(filename, 'dataset_2_padded_transform_incident_later_nentry3097To3225.pt'):
+        if fnmatch.fnmatch(filename, 'dataset_2_padded_transform*.pt'):
             files_list_.append(os.path.join(training_file_path,filename))
     print(f'Files: {files_list_}')
     
@@ -712,7 +712,7 @@ def main(config=None):
             # n.b. you'll need to make sure the config hyperparams are the same as the model being used
             else:
 #                trained_model_name = 'training_20240408_1350_output/ckpt_tmp_299.pth'
-                trained_model_name = '/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/training_result/training_epoch_1000_different_shower20240901_1209_output/ckpt_tmp_999.pth'
+                trained_model_name = '/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/training_result/training_epoch_1000_different_shower20240901_1209_output/ckpt_tmp_500.pth'
                 output_directory = generate(files_list_, load_filename=trained_model_name, device=device)
             
 
