@@ -450,7 +450,7 @@ class ScoreMatchingLoss(nn.Module):
 
         # Calculate the Denoise Score-matching objective
         # Mean the losses across all hits and 4-vectors (using sum, loss numerical value gets too large)
-        losses = torch.square( scores*std_[:,None,None] + z )
+        losses = torch.abs( scores*std_[:,None,None] + z )
         losses = torch.mean( losses, dim=(1,2) )
 
         # Mean loss for batch
