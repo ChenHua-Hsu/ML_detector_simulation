@@ -991,7 +991,7 @@ if __name__=='__main__':
     # Run main function using sweep agents reading from configs
     # Sweeps run by setting range of parameter values to explore, else set single parameter value
     # Running from yaml files facilitates submitting (several) jobs to condor
-      n_runs = 5
+      n_runs = 2
       sweep_id = wandb.sweep(sweep_yml, project="NCSM-"+project_name)
       wandb.agent(sweep_id, main, count=n_runs)
     
