@@ -153,7 +153,9 @@ class Gen(nn.Module):
         # Embed 'time' condition
         embed_t_ = self.act_sig( self.embed_t(t) )
         # Embed incident particle energy
-        embed_e_ = self.act_sig( np.exp(self.embed_e(e)).cpu())
+        e1 = self.embed_e(e).cpu()
+        e = np.exp(e1).cpu()
+        embed_e_ = self.act_sig(e)
         # 'class' token (mean field)
         x_cls = self.cls_token.expand(x.size(0), 1, -1)
         
