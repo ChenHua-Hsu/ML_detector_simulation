@@ -153,8 +153,8 @@ class Gen(nn.Module):
         # Embed 'time' condition
         embed_t_ = self.act_sig( self.embed_t(t) )
         # Embed incident particle energy
-        e1 = self.embed_e(e).cpu()
-        e = np.exp(e1).cpu()
+        e1 = self.embed_e(e).to(x.device)
+        e = np.exp(e1).to(x.device)
         embed_e_ = self.act_sig(e)
         # 'class' token (mean field)
         x_cls = self.cls_token.expand(x.size(0), 1, -1)
@@ -163,6 +163,10 @@ class Gen(nn.Module):
         # Feed input embeddings into encoder block
         for layer in self.encoder:
             # Match dimensions and append to input
+            print("x device:", x.device)
+            print("embed_t_ device:", embed_t_.device)
+            print("embed_e_ device:", embed_e_.device)
+
             x += self.dense_t(embed_t_).clone()
             x += self.dense_e(embed_e_).clone()
             # Each encoder block takes previous blocks output as input
