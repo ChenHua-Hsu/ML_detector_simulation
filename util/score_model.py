@@ -153,8 +153,10 @@ class Gen(nn.Module):
         # Embed 'time' condition
         embed_t_ = self.act_sig( self.embed_t(t) )
         # Embed incident particle energy
-        e1 = self.embed_e(e).cpu()
-        e = np.exp(e1).cpu()
+        e1 = self.embed_e(e)  # This is still on CUDA
+        e1_cpu = e1.cpu().detach().numpy()  # Move to CPU and detach
+        e = np.exp(e1_cpu)  # Apply the exponential function
+        e = torch.tensor(e, device=x.device)
         embed_e_ = self.act_sig(e)
         # 'class' token (mean field)
         x_cls = self.cls_token.expand(x.size(0), 1, -1)
