@@ -712,7 +712,7 @@ def main(config=None):
             # n.b. you'll need to make sure the config hyperparams are the same as the model being used
             else:
 #                trained_model_name = 'training_20240408_1350_output/ckpt_tmp_299.pth'
-                trained_model_name = '/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/training_result/training_epoch_1000_different_shower20240901_1209_output/ckpt_tmp_999.pth'
+                trained_model_name = '/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/training_result/training_20240919_0825_output_exp_incident/ckpt_tmp_760.pth'
                 output_directory = generate(files_list_, load_filename=trained_model_name, device=device)
             
 
