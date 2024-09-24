@@ -13,8 +13,8 @@ plt.rcParams['font.family'] = 'serif'  # Optional: Change to a LaTeX-compatible 
 plt.rcParams['mathtext.fontset'] = 'cm'
 
 from prettytable import PrettyTable
-torch.manual_seed(1234)
-np.random.seed(1234)
+#torch.manual_seed(1234)
+#np.random.seed(1234)
 # Pytorch libs
 import torch.nn as nn
 import torch.nn.functional as F
