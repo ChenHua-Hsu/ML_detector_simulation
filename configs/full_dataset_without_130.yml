@@ -10,7 +10,7 @@ parameters:
   lr:
     value: 0.003
   epochs:
-    value: 1000
+    value: 530
   n_feat_dim: 
     value: 4
   embed_dim: 
