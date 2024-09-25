@@ -16,6 +16,13 @@ from prettytable import PrettyTable
 #torch.manual_seed(1234)
 #np.random.seed(1234)
 # Pytorch libs
+seed = int(time.time())
+# Set the seed in NumPy
+np.random.seed(seed)
+print(f"Random seed (from time): {seed}")
+
+myseed = torch.seed()
+print(f"Random seed (from torch): {myseed}")
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.optim import Adam, RAdam
