@@ -578,7 +578,8 @@ def main(config=None):
     indir = args.inputs
     switches_ = int('0b'+args.switches,2)
     switches_str = bin(int('0b'+args.switches,2))
-
+    print(f"Random seed (from time): {seed}")
+    print(f"Random seed (from torch): {myseed}")
     trigger = 0b0001
     print(f'switches trigger: {switches_str}')
     if switches_ & trigger:

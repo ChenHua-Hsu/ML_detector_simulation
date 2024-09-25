@@ -69,6 +69,8 @@ class pc_sampler:
         self.std_y = []
         self.mean_z = []
         self.std_z = []
+        print(f"Random seed (from time): {seed}")
+        print(f"Random seed (from torch): {myseed}")
 
     def random_sampler(self, pdf,xbin):
         myCDF = np.zeros_like(xbin,dtype=float)
