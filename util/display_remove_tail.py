@@ -153,7 +153,7 @@ def plot_distribution(files_:Union[ list , utils.cloud_dataset], nshowers_2_plot
         # Using several files so want to take even # samples from each file for plots
         n_files = len(files_)
         print(f'# files: {n_files}')
-        nshowers_per_file = [1311,6685,774,613,615]
+        nshowers_per_file = [774]
         #r_ = nshowers_2_plot % nshowers_per_file[0]
         #nshowers_per_file[-1] = nshowers_per_file[-1]+r_
         print(f'# showers per file: {nshowers_per_file}')
