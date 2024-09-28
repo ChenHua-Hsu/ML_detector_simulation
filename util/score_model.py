@@ -167,9 +167,6 @@ class Gen(nn.Module):
         # Feed input embeddings into encoder block
         for layer in self.encoder:
             # Match dimensions and append to input
-            print("x device:", x.device)
-            print("embed_t_ device:", embed_t_.device)
-            print("embed_e_ device:", embed_e_.device)
 
             x += self.dense_t(embed_t_).clone()
             x += self.dense_e(embed_e_).clone()
