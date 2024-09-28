@@ -251,7 +251,7 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
     
     n_files = len(files_list_)
     print(f'n_files: {n_files}')
-    nshowers_per_file = [6685]
+    nshowers_per_file = [615]
     #r_ = config.n_showers_2_gen % nshowers_per_file[0]
     #nshowers_per_file[-1] = nshowers_per_file[-1]+r_
     shower_counter = 0
@@ -612,7 +612,7 @@ def main(config=None):
     files_list_ = []
     print(f'Training files found in: {training_file_path}')
     for filename in os.listdir(training_file_path):
-        if fnmatch.fnmatch(filename, 'dataset_2_padded_transform_incident_later_nentry130To258.pt'):
+        if fnmatch.fnmatch(filename, 'dataset_2_padded_transform_incident_later_nentry4*.pt'):
             files_list_.append(os.path.join(training_file_path,filename))
     print(f'Files: {files_list_}')
     
