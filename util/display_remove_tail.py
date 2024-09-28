@@ -1050,7 +1050,7 @@ class High_class_feature_plot_test:
         self.shower_nums = []
 
         i = 0 
-        self.batches = [6685]#[1311,615,613,774,6685,2]#[774,613,2,6685,615,1311]
+        self.batches = [774]#[1311,615,613,774,6685,2]#[774,613,2,6685,615,1311]
         # Load and concatenate all reference files, and keep track of shower counts
         for ref_file in reference_files:
             print(ref_file)
