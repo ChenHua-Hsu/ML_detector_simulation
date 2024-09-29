@@ -244,7 +244,7 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
     
     n_files = len(files_list_)
     print(f'n_files: {n_files}')
-    nshowers_per_file = [1311,6685,774,613,615]
+    nshowers_per_file = [615]
     #r_ = config.n_showers_2_gen % nshowers_per_file[0]
     #nshowers_per_file[-1] = nshowers_per_file[-1]+r_
     shower_counter = 0
