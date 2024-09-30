@@ -97,7 +97,10 @@ def train_model(files_list_, device='cpu',serialized_model=False):
     else:
         model = score_model.get_seq_model(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, marginal_prob_std=marginal_prob_std_fn)
     #model = score_model.Gen(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, marginal_prob_std=marginal_prob_std_fn)
+    initial_state_dict = torch.load('/eos/home-c/chenhua/copy_tdsm_encoder_sweep16/./training_result/training_20240928_1535_output/ckpt_tmp_320.pth')
 
+    # Load the state_dict into your model
+    model.load_state_dict(initial_state_dict)
     table = PrettyTable(['Module name', 'Parameters listed'])
     t_params = 0
     for name_ , para_ in model.named_parameters():
