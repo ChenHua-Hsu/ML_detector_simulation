@@ -8,9 +8,9 @@ parameters:
   batch_size:
     value: 128
   lr:
-    values: [0.003, 0.005, 0.001, 0.0033, 0.0027]
+    values: [0.003, 0.001, 0.0005, 0.0001]
   epochs:
-    value: 1000
+    value: 500
   n_feat_dim: 
     value: 4
   embed_dim: 

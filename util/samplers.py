@@ -1,6 +1,7 @@
 import functools, torch, tqdm
 import numpy as np
-
+torch.manual_seed(1234)
+np.random.seed(1234)
 class pc_sampler:
     def __init__(self, sde, padding_value, snr=0.2, sampler_steps=100, steps2plot=(), device='cuda', eps=1e-3, jupyternotebook=False, serialized_model=False):
         ''' Generate samples from score based models with Predictor-Corrector method
