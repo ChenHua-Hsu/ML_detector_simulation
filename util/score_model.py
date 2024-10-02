@@ -159,7 +159,7 @@ class Gen(nn.Module):
         # e1_cpu = e1.cpu().detach().numpy()  # Move to CPU and detach
         # e = np.exp(e1_cpu)  # Apply the exponential function
         # e = torch.tensor(e, device=x.device)  # Convert back to a tensor on the same device as x
-        embed_e_ = self.act_sig(self.embed_e(e))  # Now apply your activation function
+        embed_e_ = self.act_sig(self.embed_e(e1))  # Now apply your activation function
 
         # 'class' token (mean field)
         x_cls = self.cls_token.expand(x.size(0), 1, -1)
