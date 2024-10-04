@@ -276,7 +276,7 @@ class Convertor_ref:
           Z_ = np.asarray((data_[0][:,3])).reshape(-1,1)
           inE_ = data_[1]
           new_inE_ = self.preprocessor.inverse_transform_incident_energy(inE_)
-          new_inE_ = new_inE_ * 1000.
+          #new_inE_ = new_inE_ * 1000.
           new_inE_ = new_inE_.item()
           print(new_inE_)
           new_E_, new_X_, new_Y_, new_Z_ = self.preprocessor.inverse_transform_hit(E_, X_, Y_, Z_, new_inE_, self.padding_value, new_padding_value)
