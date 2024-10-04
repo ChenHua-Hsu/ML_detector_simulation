@@ -1,5 +1,14 @@
-import functools, torch, tqdm
+import functools, torch, tqdm, time
 import numpy as np
+#torch.manual_seed(1234)
+#np.random.seed(1234)
+seed = int(time.time())
+# Set the seed in NumPy
+np.random.seed(seed)
+print(f"Random seed (from time): {seed}")
+
+myseed = torch.seed()
+print(f"Random seed (from torch): {myseed}")
 
 class pc_sampler:
     def __init__(self, sde, padding_value, snr=0.2, sampler_steps=100, steps2plot=(), device='cuda', eps=1e-3, jupyternotebook=False, serialized_model=False):
@@ -60,6 +69,8 @@ class pc_sampler:
         self.std_y = []
         self.mean_z = []
         self.std_z = []
+        print(f"Random seed (from time): {seed}")
+        print(f"Random seed (from torch): {myseed}")
 
     def random_sampler(self, pdf,xbin):
         myCDF = np.zeros_like(xbin,dtype=float)

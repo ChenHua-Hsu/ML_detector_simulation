@@ -94,7 +94,7 @@ class Preprocessor:
       return new_E, new_X, new_Y, new_Z
 
     def inverse_transform_hit(self, E,X,Y,Z, incident_energy, padding_value, new_padding_value):
-      mask = (E == padding_value)
+      mask = (E == padding_value) #& (E <= -15.0) & (E >= 0.)
       new_E = self.inverse_transform_hit_e(E, mask, new_padding_value, incident_energy)
       new_X = self.inverse_transform_hit_xy(X, mask, new_padding_value)
       new_Y = self.inverse_transform_hit_xy(Y, mask, new_padding_value)
@@ -134,8 +134,6 @@ class Convertor:
           Y_ = np.asarray((data_[0][:,2])).reshape(-1,1)
           Z_ = np.asarray((data_[0][:,3])).reshape(-1,1)
           inE_ = data_[1]
-          # Remove the outliner of energy
-          E_ = E_[(E_>= -15.) & (E_<= 0.)]
           new_inE_ = self.preprocessor.inverse_transform_incident_energy(inE_)
           new_inE_ = new_inE_.item()
           new_E_, new_X_, new_Y_, new_Z_ = self.preprocessor.inverse_transform_hit(E_, X_, Y_, Z_, new_inE_, self.padding_value, new_padding_value)
@@ -198,7 +196,7 @@ class Convertor:
 class Convertor_ref:
     def __init__(self, dataset_name, label, padding_value = 0, device='cpu', preprocessor='datasets/test/dataset_2_padded_nentry1129To1269_preprocessor.pkl'):
 
-        self.batches_per_file = [615]#[1311,6685,774,613,615,2]#[1311,615,613,774,6685,2]
+        self.batches_per_file = [1311,6685,774,613,615,2]#[1311,615,613,774,6685,2]
         #dataset = torch.load(dataset_name, map_location = torch.device(device))
         #label_tensor = torch.ones(len(dataset[0]), device=device) * label
         #self.dataset = Evaluate.evaluate_dataset(dataset[0], dataset[1], label_tensor, device)
@@ -278,7 +276,7 @@ class Convertor_ref:
           Z_ = np.asarray((data_[0][:,3])).reshape(-1,1)
           inE_ = data_[1]
           new_inE_ = self.preprocessor.inverse_transform_incident_energy(inE_)
-          new_inE_ = new_inE_ * 1000.
+          #new_inE_ = new_inE_ * 1000.
           new_inE_ = new_inE_.item()
           print(new_inE_)
           new_E_, new_X_, new_Y_, new_Z_ = self.preprocessor.inverse_transform_hit(E_, X_, Y_, Z_, new_inE_, self.padding_value, new_padding_value)
