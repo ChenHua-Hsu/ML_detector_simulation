@@ -146,6 +146,7 @@ def train_model(files_list_, device='cpu',serialized_model=False):
             
             # Load shower batch for training
             for i, (shower_data,incident_energies) in enumerate(shower_loader_train,0):
+                shower_data[:,:,0] = (shower_data[:,:,0]+15.) / 15.
                 batch_ct+=1
                 # Move model to device and set dtype as same as data (note torch.double works on both CPU and GPU)
                 model.to(device, shower_data.dtype)
@@ -170,6 +171,7 @@ def train_model(files_list_, device='cpu',serialized_model=False):
             
             # Testing on subset of file
             for i, (shower_data,incident_energies) in enumerate(shower_loader_test,0):
+                shower_data[:,:,0] = (shower_data[:,:,0]+15.) / 15.
                 with torch.no_grad():
                     model.to(device, shower_data.dtype)
                     model.eval()
@@ -278,6 +280,7 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
         # Loop over batches
         for i, (shower_data, incident_energies) in enumerate(point_clouds_loader,0):
             # Copy data
+            shower_data[:,:,0] = (shower_data[:,:,0]+15.) / 15.
             valid_event = []
             data_np = shower_data.cpu().numpy().copy()
             energy_np = incident_energies.cpu().numpy().copy()
