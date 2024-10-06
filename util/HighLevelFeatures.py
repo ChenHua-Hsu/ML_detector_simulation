@@ -132,8 +132,8 @@ class HighLevelFeatures:
             if (vmax < 1e-1) or (data.min() > 1e-2):
               print("[Warning] max(data) too small or min(data) too big, data range [{min_}, {max_}]".format(min_ = data.min(), max_ = data.max())) 
             vmax = max(1e-1, vmax)
-            vmin = min(1e-2, data.min())
-        pcm = ax.pcolormesh(theta, rad, data_repeated.T+1e-16, norm=LN(vmin=1e-2, vmax=vmax))
+            vmin = min(1e-5, data.min())
+        pcm = ax.pcolormesh(theta, rad, data_repeated.T+1e-16, norm=LN(vmin=1e-5, vmax=vmax))
         ax.axes.get_xaxis().set_visible(False)
         ax.axes.get_yaxis().set_visible(False)
         if self.particle == 'electron':
@@ -183,8 +183,8 @@ class HighLevelFeatures:
         vmax = data.max()
         vmax = max(1e-1, vmax)
         vmax = min(vmax, 1e5)
-        vmax = 1e2
-        vmin = 1e-2
+        vmax = 1e1
+        vmin = 1e-5
         for idx, layer in enumerate(self.relevantLayers):
             radii = np.array(self.r_edges[idx])
             if self.particle != 'electron':
