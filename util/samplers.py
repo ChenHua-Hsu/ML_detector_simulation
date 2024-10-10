@@ -335,6 +335,7 @@ class pc_sampler:
                 diffusion_step_+=1
                 
         # Do not include noise in last step
+        x_mean[:,:,0] = x_mean[:,:,0]*15.-15. 
         return x_mean
 
 class new_pc_sampler:
