@@ -26,6 +26,19 @@ class GaussianFourierProjection(nn.Module):
         # Output [sin(2pi*wt);cos(2pi*wt)]
         gauss_out = torch.cat([torch.sin(time_proj), torch.cos(time_proj)], dim=-1)
         return gauss_out
+class GaussianFourierProjection_e(nn.Module):
+    """Gaussian random features for encoding time steps"""
+    def __init__(self, embed_dim, scale=30):
+        super().__init__()
+        # Time information incorporated via Gaussian random feature encoding
+        # Randomly sampled weights initialisation. Fixed during optimisation i.e. not trainable
+        self.W = nn.Parameter(torch.randn(embed_dim // 2) * scale, requires_grad=False)
+    def forward(self, time):
+        # Multiply batch of times by network weights
+        time_proj = time[:, None] * self.W[None, :]
+        # Output [sin(2pi*wt);cos(2pi*wt)]
+        gauss_out = torch.cat([(time_proj),(time_proj)], dim=-1)
+        return gauss_out
 
 class Dense(nn.Module):
     """Fully connected layer that reshapes output of embedded conditional variable to feature maps"""
@@ -113,7 +126,7 @@ class Gen(nn.Module):
         # Embedding: size of input (n_feat_dim) features -> size of output (embed_dim)
         self.embed = nn.Linear(n_feat_dim, embed_dim)
         # Seperate embedding for (time/incident energy) conditional inputs (small NN with fixed weights)
-        self.embed_e = nn.Linear(embed_dim, embed_dim)
+        self.embed_e = nn.Sequential(GaussianFourierProjection_e(embed_dim=embed_dim), nn.Linear(embed_dim, embed_dim))
         self.embed_t = nn.Sequential(GaussianFourierProjection(embed_dim=embed_dim), nn.Linear(embed_dim, embed_dim))
         # Boils embedding down to single value
         self.dense_t = Dense(embed_dim, 1)
