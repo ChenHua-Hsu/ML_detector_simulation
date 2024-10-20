@@ -113,7 +113,7 @@ class Gen(nn.Module):
         # Embedding: size of input (n_feat_dim) features -> size of output (embed_dim)
         self.embed = nn.Linear(n_feat_dim, embed_dim)
         # Seperate embedding for (time/incident energy) conditional inputs (small NN with fixed weights)
-        self.embed_e = nn.Sequential(GaussianFourierProjection(embed_dim=embed_dim), nn.Linear(embed_dim, embed_dim))
+        self.embed_e = nn.Linear(embed_dim, embed_dim)
         self.embed_t = nn.Sequential(GaussianFourierProjection(embed_dim=embed_dim), nn.Linear(embed_dim, embed_dim))
         # Boils embedding down to single value
         self.dense_t = Dense(embed_dim, 1)
