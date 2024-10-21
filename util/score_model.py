@@ -37,6 +37,17 @@ class Dense(nn.Module):
             [batchsize, (dummy)nhits, (dummy)features]
         """
         return self.dense(x)[..., None]
+    
+class FiLM(nn.Module):
+    def __init__(self, embed_dim):
+        super().__init__()
+        self.gamma = nn.Linear(embed_dim, embed_dim)
+        self.beta = nn.Linear(embed_dim, embed_dim)
+
+    def forward(self, x, e):
+        gamma = self.gamma(e)
+        beta = self.beta(e)
+        return gamma * x + beta
 
 class Block(nn.Module):
     def __init__(self, embed_dim, num_heads, hidden_dim, dropout):
@@ -139,6 +150,7 @@ class Gen(nn.Module):
         self.act_sig = lambda x: x * torch.sigmoid(x)
         # Standard deviation of SDE
         self.marginal_prob_std = marginal_prob_std
+        self.FiLM = FiLM(embed_dim)
 
     def forward(self, x, t, e, mask=None):
         """
@@ -161,9 +173,10 @@ class Gen(nn.Module):
         # Feed input embeddings into encoder block
         for layer in self.encoder:
             # Match dimensions and append to input
-            #x += self.dense_t(embed_t_).clone()
-            print(self.dense_e(embed_e_).clone())
-            x += self.dense_e(embed_e_).clone()
+            x += self.dense_t(embed_t_).clone()
+            #print(self.dense_e(embed_e_).clone())
+            #x += self.dense_e(embed_e_).clone()
+            x = self.FiLM(x, embed_e_)
             # Each encoder block takes previous blocks output as input
             # To embed the high class feature,for example, I want to add a input embedding to let it know that if energy is higher it's x,y should lower
 
