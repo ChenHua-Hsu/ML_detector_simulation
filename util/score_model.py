@@ -169,7 +169,7 @@ class Gen(nn.Module):
         # 'class' token (mean field)
         x_cls = self.cls_token.expand(x.size(0), 1, -1)
         
-        
+        e = e.unsqueeze(1).expand(-1, x.size(1), -1)
         # Feed input embeddings into encoder block
         for layer in self.encoder:
             # Match dimensions and append to input
