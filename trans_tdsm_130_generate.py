@@ -101,7 +101,7 @@ def train_model(files_list_, device='cpu',serialized_model=False):
     loss_fn = score_model.ScoreMatchingLoss()
     if not serialized_model:
         model = score_model.Gen(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, marginal_prob_std=marginal_prob_std_fn)
-        #model.load_state_dict(torch.load('/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/training_result/training_20241015_0152_output/ckpt_tmp_250.pth'))
+        model.load_state_dict(torch.load('/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/training_result/training_20241021_0225_output/ckpt_tmp_290.pth'))
     else:
         model = score_model.get_seq_model(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, marginal_prob_std=marginal_prob_std_fn)
     #model = score_model.Gen(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, marginal_prob_std=marginal_prob_std_fn)
