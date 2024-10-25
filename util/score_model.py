@@ -117,7 +117,7 @@ class Gen(nn.Module):
         self.embed_t = nn.Sequential(GaussianFourierProjection(embed_dim=embed_dim), nn.Linear(embed_dim, embed_dim))
         # Boils embedding down to single value
         self.dense_t = Dense(embed_dim, 1)
-        self.dense_e = Dense(embed_dim, 1)
+        self.dense_e = Dense(embed_dim, embed_dim)
         # Module list of encoder blocks
         self.encoder = nn.ModuleList(
             [
@@ -161,8 +161,9 @@ class Gen(nn.Module):
         # Feed input embeddings into encoder block
         for layer in self.encoder:
             # Match dimensions and append to input
+            embed_e_unsqueezed = self.dense_e.unsqueeze(1).transpose(1,2).clone()
             x += self.dense_t(embed_t_).clone()
-            x += self.dense_e(embed_e_).clone()
+            x += embed_e_unsqueezed(embed_e_)
             # Each encoder block takes previous blocks output as input
             # To embed the high class feature,for example, I want to add a input embedding to let it know that if energy is higher it's x,y should lower
 
