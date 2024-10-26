@@ -36,7 +36,7 @@ class Dense(nn.Module):
         """Dense nn layer output must have same dimensions as input data:
             [batchsize, (dummy)nhits, (dummy)features]
         """
-        return self.dense(x)[..., None]
+        return self.dense(x).unsqueeze(1)
 
 class Block(nn.Module):
     def __init__(self, embed_dim, num_heads, hidden_dim, dropout):
@@ -161,9 +161,8 @@ class Gen(nn.Module):
         # Feed input embeddings into encoder block
         for layer in self.encoder:
             # Match dimensions and append to input
-            embed_e_unsqueezed = embed_e_.unsqueeze(1).transpose(1,2).clone()
             x += self.dense_t(embed_t_).clone()
-            x += self.dense_e(embed_e_unsqueezed).clone()
+            x += self.dense_e(embed_e_).clone()
             # Each encoder block takes previous blocks output as input
             # To embed the high class feature,for example, I want to add a input embedding to let it know that if energy is higher it's x,y should lower
 
