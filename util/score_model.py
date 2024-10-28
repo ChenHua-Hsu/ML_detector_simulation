@@ -156,7 +156,10 @@ class Gen(nn.Module):
         embed_e_ = self.embed_e(e)
         # 'class' token (mean field)
         x_cls = self.cls_token.expand(x.size(0), 1, -1)
-        
+
+        print(self.dense_t(embed_t_).shape)
+        print(self.dense_e(embed_e_).shape)
+
         
         # Feed input embeddings into encoder block
         for layer in self.encoder:
