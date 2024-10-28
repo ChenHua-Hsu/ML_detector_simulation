@@ -26,6 +26,21 @@ class GaussianFourierProjection(nn.Module):
         # Output [sin(2pi*wt);cos(2pi*wt)]
         gauss_out = torch.cat([torch.sin(time_proj), torch.cos(time_proj)], dim=-1)
         return gauss_out
+    
+class LinearTimeProjection(nn.Module):
+    """Linear projection for encoding time steps to an embedding dimension without Gaussian features"""
+    def __init__(self, embed_dim):
+        super().__init__()
+        # A fully connected layer to map time from (B,) to (B, embed_dim)
+        self.linear = nn.Linear(1, embed_dim)
+
+    def forward(self, time):
+        # Reshape time from (B,) to (B, 1) for compatibility with the linear layer
+        time = time[:, None]
+        # Apply the linear layer to project to (B, embed_dim)
+        time_proj = self.linear(time)
+        return time_proj
+
 
 class Dense(nn.Module):
     """Fully connected layer that reshapes output of embedded conditional variable to feature maps"""
