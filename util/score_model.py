@@ -151,9 +151,9 @@ class Gen(nn.Module):
         # Embed 4-vector input 
         x = self.embed(x)
         # Embed 'time' condition
-        embed_t_ = self.act_sig( self.embed_t(t) )
+        embed_t_ = self.embed_t(t)
         # Embed incident particle energy
-        embed_e_ = self.act_sig( self.embed_e(e) )
+        embed_e_ = self.embed_e(e)
         # 'class' token (mean field)
         x_cls = self.cls_token.expand(x.size(0), 1, -1)
         
