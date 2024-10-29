@@ -183,8 +183,8 @@ class Gen(nn.Module):
         for layer in self.encoder:
             # Match dimensions and append to input
             x += self.dense_t(embed_t_).clone()
-            x = torch.concatenate((x, e), axis=2)
-            x = self.recover(x)
+            x += e
+            #x = self.recover(x)
             # Each encoder block takes previous blocks output as input
             # To embed the high class feature,for example, I want to add a input embedding to let it know that if energy is higher it's x,y should lower
 
