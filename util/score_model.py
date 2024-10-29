@@ -173,7 +173,7 @@ class Gen(nn.Module):
         # 'class' token (mean field)
         x_cls = self.cls_token.expand(x.size(0), 1, -1)
 
-        e = e.unsqueeze(1).unsqueeze(1)
+        e = e.unsqueeze(1).unsqueeze(2).expand(-1, x.size(1), 1)
         print(e.shape)
         
         #print("t",self.dense_t(embed_t_).shape)
