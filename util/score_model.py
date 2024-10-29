@@ -154,6 +154,7 @@ class Gen(nn.Module):
         self.act_sig = lambda x: x * torch.sigmoid(x)
         # Standard deviation of SDE
         self.marginal_prob_std = marginal_prob_std
+        self.recover = nn.Linear(embed_dim+1, embed_dim)
 
     def forward(self, x, t, e, mask=None):
         """
@@ -171,15 +172,19 @@ class Gen(nn.Module):
         embed_e_ = self.act_sig( self.embed_e(e) )
         # 'class' token (mean field)
         x_cls = self.cls_token.expand(x.size(0), 1, -1)
+
+        e = e.unsqueeze(1).unsqueeze(1)
+        print(e.shape)
         
         #print("t",self.dense_t(embed_t_).shape)
-        print("ine_e",self.dense_e(embed_e_).shape)
+        #print("ine_e",self.dense_e(embed_e_).shape)
         
         # Feed input embeddings into encoder block
         for layer in self.encoder:
             # Match dimensions and append to input
             x += self.dense_t(embed_t_).clone()
-            x += self.dense_e(embed_e_).clone()
+            x = np.concatenate((x, e), axis=2)
+            x = self.recover(x)
             # Each encoder block takes previous blocks output as input
             # To embed the high class feature,for example, I want to add a input embedding to let it know that if energy is higher it's x,y should lower
 
