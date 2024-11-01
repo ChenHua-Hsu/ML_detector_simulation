@@ -24,7 +24,7 @@ if __name__ == '__main__':
   parser = argparse.ArgumentParser(description=usage)
   parser.add_argument('--config_file', type=str, default = '/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/configs/scale_in_Fourier.yml',help = 'configuration file for wandb')
   parser.add_argument('--python_cfg', type=str, default = 'trans_tdsm_130_generate.py', help = 'python file to run the code')
-  parser.add_argument('--n_run', type=int, default = 5, help = 'number of runs')
+  parser.add_argument('--n_run', type=int, default = 15, help = 'number of runs')
   parser.add_argument('--dryRun', action='store_true', help = 'not submit to condor')
   parser.add_argument('--afs_dir', type=str, default = '/afs/cern.ch/user/c/chenhua', help='workspace in afs space')
   parser.add_argument('--JobFlavour', type=str, default = 'nextweek', help='JobFlavour for condor')

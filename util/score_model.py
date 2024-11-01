@@ -98,7 +98,7 @@ class Block(nn.Module):
         return x
 
 class Gen(nn.Module):
-    def __init__(self, n_feat_dim, embed_dim, hidden_dim, num_encoder_blocks, num_attn_heads, dropout_gen, marginal_prob_std, **kwargs):
+    def __init__(self, n_feat_dim, embed_dim, hidden_dim, num_encoder_blocks, num_attn_heads, dropout_gen, scale, marginal_prob_std, **kwargs):
         """Transformer encoder model
         Arguments:
         n_feat_dim = number of features
@@ -113,7 +113,7 @@ class Gen(nn.Module):
         # Embedding: size of input (n_feat_dim) features -> size of output (embed_dim)
         self.embed = nn.Linear(n_feat_dim, embed_dim)
         # Seperate embedding for (time/incident energy) conditional inputs (small NN with fixed weights)
-        self.embed_e = nn.Sequential(GaussianFourierProjection(embed_dim=embed_dim), nn.Linear(embed_dim, embed_dim))
+        self.embed_e = nn.Sequential(GaussianFourierProjection(embed_dim=embed_dim,scale=scale), nn.Linear(embed_dim, embed_dim))
         self.embed_t = nn.Sequential(GaussianFourierProjection(embed_dim=embed_dim), nn.Linear(embed_dim, embed_dim))
         # Boils embedding down to single value
         self.dense_t = Dense(embed_dim, 1)
