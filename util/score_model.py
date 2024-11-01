@@ -15,7 +15,7 @@ from torch.utils.checkpoint import checkpoint_sequential
 
 class GaussianFourierProjection(nn.Module):
     """Gaussian random features for encoding time steps"""
-    def __init__(self, embed_dim, scale=30):
+    def __init__(self, embed_dim, scale=1):
         super().__init__()
         # Time information incorporated via Gaussian random feature encoding
         # Randomly sampled weights initialisation. Fixed during optimisation i.e. not trainable
