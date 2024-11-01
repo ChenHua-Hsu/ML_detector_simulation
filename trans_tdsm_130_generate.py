@@ -81,7 +81,7 @@ def train_model(files_list_, device='cpu',serialized_model=False):
 
     wd = os.getcwd()
     #wd = '/afs/cern.ch/work/j/jthomasw/private/NTU/fast_sim/tdsm_encoder/'
-    output_files = './training_result/training_'+datetime.now().strftime('%Y%m%d_%H%M')+'_output/'
+    output_files = './training_result/training_'+datetime.now().strftime('%Y%m%d_%H%M%S')+'_linear_time_projection_output/'
     output_directory = os.path.join(wd, output_files)
     print('Training directory: ', output_directory)
     if not os.path.exists(output_directory):
