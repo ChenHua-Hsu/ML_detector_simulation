@@ -223,6 +223,7 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
         model = score_model.Gen(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, marginal_prob_std=marginal_prob_std_fn)
     else:
         model = score_model.get_seq_model(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, marginal_prob_std=marginal_prob_std_fn)
+    model.load_state_dict(torch.load('/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/training_result/training_20241029_1048_no_layer_output/ckpt_tmp_100.pth', map_location=device ))
     #model=score_model.Gen(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, marginal_prob_std=marginal_prob_std_fn)
     if load_filename == '':
         load_name = os.path.join(wd,'training_result/training_20240817_0912_output/ckpt_tmp_199.pth')
