@@ -100,9 +100,9 @@ def train_model(files_list_, device='cpu',serialized_model=False):
     # Instantiate model
     loss_fn = score_model.ScoreMatchingLoss()
     if not serialized_model:
-        model = score_model.Gen(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, config.scale,marginal_prob_std=marginal_prob_std_fn)
+        model = score_model.Gen(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, config.scale_in_Fourier,marginal_prob_std=marginal_prob_std_fn)
     else:
-        model = score_model.get_seq_model(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, config.scale,marginal_prob_std=marginal_prob_std_fn)
+        model = score_model.get_seq_model(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, config.scale_in_Fourier,marginal_prob_std=marginal_prob_std_fn)
     #model = score_model.Gen(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, marginal_prob_std=marginal_prob_std_fn)
 
     table = PrettyTable(['Module name', 'Parameters listed'])
@@ -220,9 +220,9 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
 
     # Load saved model
     if not serialized_model:
-        model = score_model.Gen(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, config.scale,marginal_prob_std=marginal_prob_std_fn)
+        model = score_model.Gen(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, config.scale_in_Fourier,marginal_prob_std=marginal_prob_std_fn)
     else:
-        model = score_model.get_seq_model(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, config.scale,marginal_prob_std=marginal_prob_std_fn)
+        model = score_model.get_seq_model(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, config.scale_in_Fourier,marginal_prob_std=marginal_prob_std_fn)
     #model=score_model.Gen(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, marginal_prob_std=marginal_prob_std_fn)
     if load_filename == '':
         load_name = os.path.join(wd,'training_result/training_20240817_0912_output/ckpt_tmp_199.pth')
