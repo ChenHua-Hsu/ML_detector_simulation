@@ -75,13 +75,13 @@ class Block(nn.Module):
         self.dropout2 = nn.Dropout(dropout)
         self.dropout3 = nn.Dropout(dropout)
 
-    def forward(self,x,x_cls,src_key_padding_mask=None,):
+    def forward(self,x,x_cls,src_key_padding_mask=None,attn_mask = None):
         #residual = x.clone()
         
         # Mean-field attention
         # Multiheaded self-attention but replacing query with a single mean field approximator
         # attn (query, key, value, key mask)
-        cls_attn_out = self.attn(x_cls, x, x, key_padding_mask=src_key_padding_mask)[0]
+        cls_attn_out = self.attn(x_cls, x, x, key_padding_mask=src_key_padding_mask,attn_mask = attn_mask)[0]
         
         cls_attn_res_out = x_cls + cls_attn_out
         cls_norm1_out = self.norm1(self.dropout1(cls_attn_res_out))
@@ -161,12 +161,13 @@ class Gen(nn.Module):
         # Feed input embeddings into encoder block
         for layer in self.encoder:
             # Match dimensions and append to input
-            x += self.dense_t(embed_t_).clone()
-            x += self.dense_e(embed_e_).clone()
+            # x += self.dense_t(embed_t_).clone()
+            # x += self.dense_e(embed_e_).clone()
+            condition = self.dense_e(embed_e_).clone()
             # Each encoder block takes previous blocks output as input
             # To embed the high class feature,for example, I want to add a input embedding to let it know that if energy is higher it's x,y should lower
 
-            x = layer(x, x_cls, mask) # Block layers
+            x = layer(x, x_cls, mask, condition) # Block layers
         
         # Rescale models output (helps capture the normalisation of the true scores)
         mean_ , std_ = self.marginal_prob_std(x,t)
