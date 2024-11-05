@@ -139,6 +139,8 @@ class Gen(nn.Module):
         self.act_sig = lambda x: x * torch.sigmoid(x)
         # Standard deviation of SDE
         self.marginal_prob_std = marginal_prob_std
+        self.head = num_attn_heads
+        self.embed_dim = embed_dim
 
     def forward(self, x, t, e, mask=None):
         """
@@ -163,11 +165,20 @@ class Gen(nn.Module):
             # Match dimensions and append to input
             # x += self.dense_t(embed_t_).clone()
             # x += self.dense_e(embed_e_).clone()
-            condition = self.dense_e(embed_e_).clone()
+            B, S, E = x.shape
+            # Step 1: Embed `ine` to obtain shape [B, E]
+            ine_embed = self.embed_e(e)  # Now [B, E]
+
+            # Step 2: Reshape and expand `ine_embed` to match `[B, num_heads, S]`
+            # Reshape to match attention heads and sequence length
+            ine_attn_mask = ine_embed.view(B, 1, self.embed_dim).repeat(1, self.head, S)  # Now [B, num_heads, S]
+
+            # Step 3: Flatten along the batch and head dimensions
+            ine_attn_mask = ine_attn_mask.view(B * self.head, 1, S)  # Now [B * num_heads, 1, S]
             # Each encoder block takes previous blocks output as input
             # To embed the high class feature,for example, I want to add a input embedding to let it know that if energy is higher it's x,y should lower
 
-            x = layer(x, x_cls, mask, condition) # Block layers
+            x = layer(x, x_cls, mask, ine_attn_mask) # Block layers
         
         # Rescale models output (helps capture the normalisation of the true scores)
         mean_ , std_ = self.marginal_prob_std(x,t)
