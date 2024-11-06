@@ -168,13 +168,16 @@ class Gen(nn.Module):
             B, S, E = x.shape
             # Step 1: Embed `ine` to obtain shape [B, E]
             ine_embed = self.embed_e(e)  # Now [B, E]
+            print("shape of ine_embed", ine_embed.shape)
 
             # Step 2: Reshape and expand `ine_embed` to match `[B, num_heads, S]`
             # Reshape to match attention heads and sequence length
             ine_attn_mask = ine_embed.view(B, 1, self.embed_dim).repeat(1, self.head, S)  # Now [B, num_heads, S]
+            print("shape of ine_attn_mask", ine_attn_mask.shape)
 
             # Step 3: Flatten along the batch and head dimensions
             ine_attn_mask = ine_attn_mask.view(B * self.head, 1, S)  # Now [B * num_heads, 1, S]
+            print("shape of ine_attn_mask_2", ine_attn_mask.shape)
             # Each encoder block takes previous blocks output as input
             # To embed the high class feature,for example, I want to add a input embedding to let it know that if energy is higher it's x,y should lower
 
