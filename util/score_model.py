@@ -172,14 +172,19 @@ class Gen(nn.Module):
 
             # Step 2: Reshape and expand `ine_embed` to match `[B, num_heads, S]`
             # Reshape to match attention heads and sequence length
-            ine_attn_mask = ine_embed.view(B, 1, self.embed_dim).repeat(1, self.head, S)  # Now [B, num_heads, S]
+            # Start with ine_embed of shape [B, E]
+
+            # Step 1: Add dimensions for heads and sequence length
+            ine_attn_mask = ine_embed.unsqueeze(1).unsqueeze(2)  # Shape: [B, 1, 1, E]
             print("shape of ine_attn_mask", ine_attn_mask.shape)
 
-            # Step 3: Flatten along the batch and head dimensions
-            ine_attn_mask = ine_attn_mask.view(B * self.head, 1, S)  # Now [B * num_heads, 1, S]
-            print("shape of ine_attn_mask_2", ine_attn_mask.shape)
-            # Each encoder block takes previous blocks output as input
-            # To embed the high class feature,for example, I want to add a input embedding to let it know that if energy is higher it's x,y should lower
+            # Step 2: Expand across heads and sequence length
+            ine_attn_mask = ine_attn_mask.expand(B, self.head, S, self.embed_dim)  # Shape: [B, head, S, E]
+            print("shape of ine_attn_mask_after_expand", ine_attn_mask.shape)
+            # Step 3: Reshape to the final attention mask shape
+            ine_attn_mask = ine_attn_mask.reshape(B * self.head, 1, S)  # Shape: [B * num_heads, 1, S]
+            print("shape of ine_attn_mask_after_reshape", ine_attn_mask.shape)
+
 
             x = layer(x, x_cls, mask, ine_attn_mask) # Block layers
         
