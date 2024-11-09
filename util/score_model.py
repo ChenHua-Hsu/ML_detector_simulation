@@ -158,36 +158,35 @@ class Gen(nn.Module):
         embed_e_ = self.act_sig( self.embed_e(e) )
         # 'class' token (mean field)
         x_cls = self.cls_token.expand(x.size(0), 1, -1)
+
+        B, S, E = x.shape
+        # Step 1: Embed `ine` to obtain shape [B, E]
+        #ine_embed = self.embed_e(e)  # Now [B, E]
+        e = e.unsqueeze(1).unsqueeze(2)
+        print("shape of ine_embed", e.shape)
+
+        # Step 2: Reshape and expand `ine_embed` to match `[B, num_heads, S]`
+        # Reshape to match attention heads and sequence length
+        # Start with ine_embed of shape [B, E]
+
+        # Step 1: Add dimensions for heads and sequence length
+        ine_attn_mask = e.expand(B, self.head, S)
+        print("shape of ine_attn_mask", ine_attn_mask.shape)
+
+        # Step 2: Expand across heads and sequence length
+        #ine_attn_mask = ine_attn_mask.expand(B, self.head, S, self.embed_dim)  # Shape: [B, head, S, E]
+        #print("shape of ine_attn_mask_after_expand", ine_attn_mask.shape)
+        # Step 3: Reshape to the final attention mask shape
+        ine_attn_mask = ine_attn_mask.reshape(B * self.head, 1, S)  # Shape: [B * num_heads, 1, S]
+        print("shape of ine_attn_mask_after_reshape", ine_attn_mask.shape)
         
         
         
         # Feed input embeddings into encoder block
         for layer in self.encoder:
             # Match dimensions and append to input
-            # x += self.dense_t(embed_t_).clone()
+            x += self.dense_t(embed_t_).clone()
             # x += self.dense_e(embed_e_).clone()
-            B, S, E = x.shape
-            # Step 1: Embed `ine` to obtain shape [B, E]
-            #ine_embed = self.embed_e(e)  # Now [B, E]
-            e = e.unsqueeze(1).unsqueeze(2)
-            print("shape of ine_embed", e.shape)
-
-            # Step 2: Reshape and expand `ine_embed` to match `[B, num_heads, S]`
-            # Reshape to match attention heads and sequence length
-            # Start with ine_embed of shape [B, E]
-
-            # Step 1: Add dimensions for heads and sequence length
-            ine_attn_mask = e.expand(B, self.head, S)
-            print("shape of ine_attn_mask", ine_attn_mask.shape)
-
-            # Step 2: Expand across heads and sequence length
-            #ine_attn_mask = ine_attn_mask.expand(B, self.head, S, self.embed_dim)  # Shape: [B, head, S, E]
-            #print("shape of ine_attn_mask_after_expand", ine_attn_mask.shape)
-            # Step 3: Reshape to the final attention mask shape
-            ine_attn_mask = ine_attn_mask.reshape(B * self.head, 1, S)  # Shape: [B * num_heads, 1, S]
-            print("shape of ine_attn_mask_after_reshape", ine_attn_mask.shape)
-
-
             x = layer(x, x_cls, mask, ine_attn_mask) # Block layers
         
         # Rescale models output (helps capture the normalisation of the true scores)
