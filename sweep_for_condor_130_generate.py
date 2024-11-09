@@ -22,7 +22,7 @@ def prepare_shell(shell_file, command, condor, FarmDir, afs_dir):
 if __name__ == '__main__':
   usage = 'usage: %prog[options]'
   parser = argparse.ArgumentParser(description=usage)
-  parser.add_argument('--config_file', type=str, default = '/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/configs/each_epoch_generate_without_randomseed.yml',help = 'configuration file for wandb')
+  parser.add_argument('--config_file', type=str, default = '/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/configs/class_token.yml',help = 'configuration file for wandb')
   parser.add_argument('--python_cfg', type=str, default = 'trans_tdsm_130_generate.py', help = 'python file to run the code')
   parser.add_argument('--n_run', type=int, default = 2, help = 'number of runs')
   parser.add_argument('--dryRun', action='store_true', help = 'not submit to condor')
@@ -38,7 +38,7 @@ if __name__ == '__main__':
   CWD = os.getcwd()
   sweep_yml['program'] = os.path.join(CWD, args.python_cfg)
   sweep_yml['parameters']['work_dir'] = {'value': CWD}
-  sweep_yml['parameters']['switches'] = {'value': '1100'}
+  sweep_yml['parameters']['switches'] = {'value': '1110'}
   sweep_yml['parameters']['condor']   = {'value': 1}
   sweep_yml['parameters']['inputs']= {'value': os.path.join(CWD, "fulldataset")}
   sweep_yml['parameters']['preprocessor'] = {'value': os.path.join(CWD, "fulldataset/dataset_2_padded_transform_incident_later_nentry2065To2193_preprocessor.pkl")}

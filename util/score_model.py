@@ -421,6 +421,8 @@ class ScoreMatchingLoss(nn.Module):
 
         # Tensor of randomised 'time' steps
         random_t = torch.rand(incident_energies.shape[0], device=device) * (1. - eps) + eps
+        print(random_t)
+        print(incident_energies)
 
         # Mask to avoid perturbing padded entries
         #input_mask = (x[:,:,0] != 0).unsqueeze(-1)
