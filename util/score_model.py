@@ -295,7 +295,7 @@ def get_seq_model(n_feat_dim, embed_dim, hidden_dim, num_encoder_blocks, num_att
     return seq_model
 
 
-def loss_fn(model, x, incident_energies, marginal_prob_std , padding_value=0, eps=1e-3, device='cpu', diffusion_on_mask=False, serialized_model=False, cp_chunks=0, weight=None):
+def loss_fn(model, x, incident_energies, marginal_prob_std ,loss_list, ine_list, t_list, padding_value=0, eps=1e-3, device='cpu', diffusion_on_mask=False, serialized_model=False, cp_chunks=0, weight=None):
 
     """The loss function for training score-based generative models
     Uses the weighted sum of Denoising Score matching objectives
@@ -343,37 +343,8 @@ def loss_fn(model, x, incident_energies, marginal_prob_std , padding_value=0, ep
             scores = checkpoint_sequential(model, cp_chunks, [perturbed_x, random_t, incident_energies, attn_padding_mask])
     else:
         scores = model(perturbed_x, random_t, incident_energies, mask=attn_padding_mask)
-        # if torch.isnan(scores).any():
-        #     # Log if there are any nans in the input
-        #     with open("/home/ken91021615/tdsm_encoder_sweep0516/util/log.txt", "a") as file:
-        #         file.write("Nan in scores\n")
-        #     if torch.isnan(perturbed_x).any():
-        #         with open("/home/ken91021615/tdsm_encoder_sweep0516/util/log.txt", "a") as file:
-        #             file.write("Nan in perturbed_x\n")
-        #     else:
-        #         with open("/home/ken91021615/tdsm_encoder_sweep0516/util/log.txt", "a") as file:
-        #             file.write("No nans in perturbed_x\n")
-        #     if torch.isnan(random_t).any():
-        #         with open("/home/ken91021615/tdsm_encoder_sweep0516/util/log.txt", "a") as file:
-        #             file.write("Nan in random_t\n")
-        #     else:
-        #         with open("/home/ken91021615/tdsm_encoder_sweep0516/util/log.txt", "a") as file:
-        #             file.write("No nans in random_t\n")
-        #     if torch.isnan(incident_energies).any():
-        #         with open("/home/ken91021615/tdsm_encoder_sweep0516/util/log.txt", "a") as file:
-        #             file.write("Nan in incident_energies\n")
-        #     else:
-        #         with open("/home/ken91021615/tdsm_encoder_sweep0516/util/log.txt", "a") as file:
-        #             file.write("No nans in incident_energies\n")
-        #     if torch.isnan(attn_padding_mask).any():
-        #         with open("/home/ken91021615/tdsm_encoder_sweep0516/util/log.txt", "a") as file:
-        #             file.write("Nan in attn_padding_mask\n")
-        #     else:
-        #         with open("/home/ken91021615/tdsm_encoder_sweep0516/util/log.txt", "a") as file:
-        #             file.write("No nans in attn_padding_mask\n")
-        # else:
-        #     with open("/home/ken91021615/tdsm_encoder_sweep0516/util/log.txt", "a") as file:
-        #         file.write("No nans in scores\n")
+
+    
     
     # Calculate loss 
     if not weight is None:
@@ -386,6 +357,10 @@ def loss_fn(model, x, incident_energies, marginal_prob_std , padding_value=0, ep
     # Calculate the Denoise Score-matching objective
     # Mean the losses across all hits and 4-vectors (using sum, loss numerical value gets too large)
     losses = torch.mean( losses, dim=(1,2) )
+
+    t_list.extend(random_t.cpu().numpy())
+    loss_list.extend(losses.cpu().numpy())
+    ine_list.extend(incident_energies.cpu().numpy())
 
     # Mean loss for batch
     batch_loss = torch.mean( losses )
