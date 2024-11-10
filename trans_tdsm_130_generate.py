@@ -200,7 +200,8 @@ def train_model(files_list_, device='cpu',serialized_model=False):
                 # Labeling the axes
                 plt.xlabel('t_list')
                 plt.ylabel('loss_list')
-                plt.title(f"2D Plot with Color Representing ine_list\n(B list: {B_list_name}, Epoch: {str(C_epoch).zfill(3)})")
+                plt.title(f"2D Plot with Color Representing ine_list\n(B list: {B_list_name}\nEpoch: {str(C_epoch).zfill(3)})")
+
                 # Save plot to a figure
                 loss_distribution = plt.gcf()
 
