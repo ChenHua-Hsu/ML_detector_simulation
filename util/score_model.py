@@ -158,8 +158,10 @@ class Gen(nn.Module):
         # 'class' token (mean field)
         x_cls = self.cls_token.expand(x.size(0), 1, -1)
 
-        e = e.unsqueeze(0).unsqueeze(1)
-        e = self.linear_e(e)
+        #x_cls = x_cls*e
+
+        #e = e.unsqueeze(0).unsqueeze(1)
+        #e = self.linear_e(e)
 
         
         
@@ -167,11 +169,11 @@ class Gen(nn.Module):
         for layer in self.encoder:
             # Match dimensions and append to input
             x += self.dense_t(embed_t_).clone()
-            #x += self.dense_e(embed_e_).clone()
+            x += self.dense_e(embed_e_).clone()
             # Each encoder block takes previous blocks output as input
             # To embed the high class feature,for example, I want to add a input embedding to let it know that if energy is higher it's x,y should lower
 
-            x = layer(x, e, mask) # Block layers
+            x = layer(x, x_cls, mask) # Block layers
         
         # Rescale models output (helps capture the normalisation of the true scores)
         mean_ , std_ = self.marginal_prob_std(x,t)
