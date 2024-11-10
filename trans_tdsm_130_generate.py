@@ -210,7 +210,9 @@ def train_model(files_list_, device='cpu',serialized_model=False):
 
                 # Log the plot to wandb
                 wandb.log({"loss_distribution": wandb.Image(loss_distribution)})
-
+                t_list.clear()
+                loss_list.clear()
+                ine_list.clear()
             
         scheduler.step()
         

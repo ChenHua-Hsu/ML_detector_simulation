@@ -162,14 +162,15 @@ class Gen(nn.Module):
 
         #e = e.unsqueeze(0).unsqueeze(1)
         #e = self.linear_e(e)
-
+        e = e.unsqueeze(1).unsqueeze(2).expand(-1, 1, x_cls.size(-1))
+        x_cls = x_cls * e
         
         
         # Feed input embeddings into encoder block
         for layer in self.encoder:
             # Match dimensions and append to input
             x += self.dense_t(embed_t_).clone()
-            x += self.dense_e(embed_e_).clone()
+            #x += self.dense_e(embed_e_).clone()
             # Each encoder block takes previous blocks output as input
             # To embed the high class feature,for example, I want to add a input embedding to let it know that if energy is higher it's x,y should lower
 
