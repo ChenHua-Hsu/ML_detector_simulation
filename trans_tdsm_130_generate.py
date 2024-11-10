@@ -5,6 +5,7 @@ import matplotlib
 matplotlib.use('Agg')
 import numpy as np
 import matplotlib.pyplot as plt
+import re
 #plt.use('Agg')
 # Enable LaTeX
 plt.rcdefaults()
@@ -191,6 +192,8 @@ def train_model(files_list_, device='cpu',serialized_model=False):
                 # Assuming "B list" and "C epoch" are given as variables
                 B_list_name = filename  # Replace with the actual name
                 C_epoch = epoch  # Replace with the actual epoch number
+                B_list_name = re.findall(r'\d+', filename)
+                B_list_name = '_'.join(B_list_name)
 
                 # Create a 2D scatter plot with color representing the third dimension (ine_list)
                 plt.figure(figsize=(8, 6))
