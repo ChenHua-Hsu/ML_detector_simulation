@@ -81,7 +81,7 @@ def train_model(files_list_, device='cpu',serialized_model=False):
 
     wd = os.getcwd()
     #wd = '/afs/cern.ch/work/j/jthomasw/private/NTU/fast_sim/tdsm_encoder/'
-    output_files = './training_result/training_'+datetime.now().strftime('%Y%m%d_%H%M')+'_output/'
+    output_files = './training_result/training_single_file_'+datetime.now().strftime('%Y%m%d_%H%M%S')+'_output/'
     output_directory = os.path.join(wd, output_files)
     print('Training directory: ', output_directory)
     if not os.path.exists(output_directory):
@@ -142,6 +142,9 @@ def train_model(files_list_, device='cpu',serialized_model=False):
 
         # Load files
         for filename in files_list_:
+            loss_list = []
+            t_list = []
+            ine_list = []
             file_counter+=1
 
             # Build dataset
@@ -184,6 +187,27 @@ def train_model(files_list_, device='cpu',serialized_model=False):
                     incident_energies = incident_energies.to(device)
                     test_loss = score_model.loss_fn(model, shower_data, incident_energies, marginal_prob_std_fn, padding_value=0.0, device=device,serialized_model=False, cp_chunks=4)
 
+            if epoch%10 == 0: 
+                # plot
+                # Assuming "B list" and "C epoch" are given as variables
+                B_list_name = filename  # Replace with the actual name
+                C_epoch = epoch  # Replace with the actual epoch number
+
+                # Create a 2D scatter plot with color representing the third dimension (ine_list)
+                plt.figure(figsize=(8, 6))
+                scatter = plt.scatter(t_list, loss_list, c=ine_list, cmap='viridis', marker='o')
+                plt.colorbar(scatter, label='ine_list')  # Color bar to represent the third dimension
+
+                # Labeling the axes
+                plt.xlabel('t_list')
+                plt.ylabel('loss_list')
+                plt.title(f"2D Plot with Color Representing ine_list\n(B list: {B_list_name}\nEpoch: {str(C_epoch).zfill(3)})")
+
+                # Save plot to a figure
+                loss_distribution = plt.gcf()
+
+                # Log the plot to wandb
+                wandb.log({"loss_distribution": wandb.Image(loss_distribution)})
         scheduler.step()
         
         # Save checkpoints
