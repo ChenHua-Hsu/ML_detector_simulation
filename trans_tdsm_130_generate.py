@@ -210,6 +210,7 @@ def train_model(files_list_, device='cpu',serialized_model=False):
 
                 # Log the plot to wandb
                 wandb.log({"loss_distribution": wandb.Image(loss_distribution)})
+                plt.close(loss_distribution) # Close the plot to free up memory
                 t_list.clear()
                 loss_list.clear()
                 ine_list.clear()
