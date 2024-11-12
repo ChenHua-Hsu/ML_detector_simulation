@@ -185,7 +185,7 @@ def train_model(files_list_, device='cpu',serialized_model=False):
                     model.eval()
                     shower_data = shower_data.to(device)
                     incident_energies = incident_energies.to(device)
-                    test_loss = score_model.loss_fn(model, shower_data, incident_energies, marginal_prob_std_fn, padding_value=0.0, device=device,serialized_model=False, cp_chunks=4)
+                    test_loss = score_model.loss_fn(model, shower_data, incident_energies, marginal_prob_std_fn, loss_list= loss_list, ine_list = ine_list, t_list = t_list, padding_value=0.0, device=device,serialized_model=False, cp_chunks=4)
 
             if epoch%10 == 0: 
                 # plot
