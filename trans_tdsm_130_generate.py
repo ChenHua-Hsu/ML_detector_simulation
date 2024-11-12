@@ -616,7 +616,7 @@ def main(config=None):
             files_list_.append(os.path.join(training_file_path,filename))
     print(f'Files: {files_list_}')
     
-    with wandb.init(config=config, project='testsweep', entity='calo_tNCSM'):
+    with wandb.init(config=config, project='testsweep', entity='calo_tNCSM', settings=wandb.Settings(_service_wait = 200)):
         # access all HPs through wandb.config, so logging matches execution!
         config = wandb.config
         if config.batch_size == 64:
