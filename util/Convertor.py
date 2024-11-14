@@ -13,8 +13,8 @@ class Preprocessor:
     def __init__(self):
         self.maxe_ = 1000.
         self.mine_ = 0.
-        self.maxz_ = 0.0
-        self.minz_ = 44.0
+        self.maxz_ = 5.0
+        self.minz_ = 0.0
 
     ########################
     ##  Incident  Energy  ##
@@ -86,20 +86,16 @@ class Preprocessor:
       new_e = np.reshape(new_e, (-1,))
       return new_e
 
-    def transform(self, E,X,Y,Z, incident_energy):
+    def transform(self, E,R, incident_energy):
       new_E = self.transform_hit_e(E, incident_energy)
-      new_X = self.transform_hit_xy(X)
-      new_Y = self.transform_hit_xy(Y)
-      new_Z = self.transform_hit_z(Z)
-      return new_E, new_X, new_Y, new_Z
+      new_R = self.transform_hit_z(R)
+      return new_E, new_R
 
-    def inverse_transform_hit(self, E,X,Y,Z, incident_energy, padding_value, new_padding_value):
+    def inverse_transform_hit(self, E,R, incident_energy, padding_value, new_padding_value):
       mask = (E == padding_value) #& (E <= -15.0) & (E >= 0.)
       new_E = self.inverse_transform_hit_e(E, mask, new_padding_value, incident_energy)
-      new_X = self.inverse_transform_hit_xy(X, mask, new_padding_value)
-      new_Y = self.inverse_transform_hit_xy(Y, mask, new_padding_value)
-      new_Z = self.inverse_transform_hit_z(Z, mask, new_padding_value)
-      return new_E, new_X, new_Y, new_Z
+      new_R = self.inverse_transform_hit_z(R, mask, new_padding_value)
+      return new_E, new_R
 
 
 class Convertor:
