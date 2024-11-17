@@ -163,7 +163,7 @@ class Gen(nn.Module):
         # Step 1: Embed `ine` to obtain shape [B, E]
         #ine_embed = self.embed_e(e)  # Now [B, E]
         e = e.unsqueeze(1).unsqueeze(2)
-        print("shape of ine_embed", e.shape)
+        #print("shape of ine_embed", e.shape)
 
         # Step 2: Reshape and expand `ine_embed` to match `[B, num_heads, S]`
         # Reshape to match attention heads and sequence length
