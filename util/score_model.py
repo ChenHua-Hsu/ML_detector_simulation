@@ -162,7 +162,7 @@ class Gen(nn.Module):
         for layer in self.encoder:
             # Match dimensions and append to input
             x += self.dense_t(embed_t_).clone()
-            #x += self.dense_e(embed_e_).clone()
+            x += self.dense_e(embed_e_).clone()
             # Each encoder block takes previous blocks output as input
             # To embed the high class feature,for example, I want to add a input embedding to let it know that if energy is higher it's x,y should lower
 
@@ -395,7 +395,7 @@ class ScoreMatchingLoss(nn.Module):
         attn_padding_mask = (x[:,:,0] == 0).type(torch.bool)
 
         # Tensor of randomised 'time' steps
-        random_t = torch.rand(incident_energies.shape[0], device=device) * (1. - eps) + eps
+        random_t = (torch.rand(incident_energies.shape[0], device=device) * (1. - eps) + eps)*0.5
 
         # Mask to avoid perturbing padded entries
         #input_mask = (x[:,:,0] != 0).unsqueeze(-1)

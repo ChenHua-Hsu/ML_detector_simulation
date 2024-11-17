@@ -81,7 +81,7 @@ def train_model(files_list_, device='cpu',serialized_model=False):
 
     wd = os.getcwd()
     #wd = '/afs/cern.ch/work/j/jthomasw/private/NTU/fast_sim/tdsm_encoder/'
-    output_files = './training_result/training_single_file_'+datetime.now().strftime('%Y%m%d_%H%M%S')+'_output/'
+    output_files = './training_result/training_small_t_'+datetime.now().strftime('%Y%m%d_%H%M%S')+'_output/'
     output_directory = os.path.join(wd, output_files)
     print('Training directory: ', output_directory)
     if not os.path.exists(output_directory):
@@ -636,7 +636,7 @@ def main(config=None):
     files_list_ = []
     print(f'Training files found in: {training_file_path}')
     for filename in os.listdir(training_file_path):
-        if fnmatch.fnmatch(filename,'dataset_2_padded_transform_incident_later_nentry1033To1161.pt'):
+        if fnmatch.fnmatch(filename,'dataset_2_padded_transform*.pt'):
             files_list_.append(os.path.join(training_file_path,filename))
     print(f'Files: {files_list_}')
     
