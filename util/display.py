@@ -194,17 +194,17 @@ def plot_distribution(files_:Union[ list , utils.cloud_dataset], nshowers_2_plot
                     # To transform back to original energies for plots
                     all_e = np.array(valid_hits[:,0]).reshape(-1,1)
                     all_x = np.array(valid_hits[:,1]).reshape(-1,1)
-                    all_y = np.array(valid_hits[:,2]).reshape(-1,1)
+                    #all_y = np.array(valid_hits[:,2]).reshape(-1,1)
                     
                     all_e = all_e.flatten().tolist()
                     all_x = all_x.flatten().tolist()
-                    all_y = all_y.flatten().tolist()
+                    #all_y = all_y.flatten().tolist()
                     
                     # Store features of individual hits in shower
                     shower_hit_energies.extend( all_e )
                     shower_hit_x.extend( all_x )
-                    shower_hit_y.extend( all_y )
-                    all_z.extend( ((valid_hits).copy()[:,3]).flatten().tolist() )
+                    #shower_hit_y.extend( all_y )
+                    #all_z.extend( ((valid_hits).copy()[:,3]).flatten().tolist() )
                     hits_ine = [ incident_energies[j] for x in range(0,len(valid_hits[:,0])) ]
                     shower_hit_ine.extend( hits_ine )
                     
@@ -218,8 +218,8 @@ def plot_distribution(files_:Union[ list , utils.cloud_dataset], nshowers_2_plot
                     # Hit means
                     sum_e_shower.extend( [np.sum(all_e)] )
                     mean_x_shower.extend( [np.mean(all_x)] )
-                    mean_y_shower.extend( [np.mean(all_y)] )
-                    mean_z_shower.extend( [np.mean(all_z)] )
+                    #mean_y_shower.extend( [np.mean(all_y)] )
+                    #mean_z_shower.extend( [np.mean(all_z)] )
                     
     elif type(files_) == utils.cloud_dataset:
         print(f'plot_distribution running on input type \'cloud_dataset\'')
@@ -251,17 +251,17 @@ def plot_distribution(files_:Union[ list , utils.cloud_dataset], nshowers_2_plot
                 # To transform back to original energies for plots                    
                 all_e = np.array(valid_hits[:,0]).reshape(-1,1)
                 all_x = np.array(valid_hits[:,1]).reshape(-1,1)
-                all_y = np.array(valid_hits[:,2]).reshape(-1,1)
+                #all_y = np.array(valid_hits[:,2]).reshape(-1,1)
                     
                 all_e = all_e.flatten().tolist()
                 all_x = all_x.flatten().tolist()
-                all_y = all_y.flatten().tolist()
+                #all_y = all_y.flatten().tolist()
                 
                 # Store features of individual hits in shower
                 shower_hit_energies.extend( all_e )
                 shower_hit_x.extend( all_x )
-                shower_hit_y.extend( all_y )
-                all_z.extend( ((valid_hits).copy()[:,3]).flatten().tolist() )
+                #shower_hit_y.extend( all_y )
+                #all_z.extend( ((valid_hits).copy()[:,3]).flatten().tolist() )
                 
                 shower_hit_ine.extend( [energy_np[j] for x in valid_hits[:,0]] ) #Use CPU version of incident_energies
                 
@@ -274,8 +274,8 @@ def plot_distribution(files_:Union[ list , utils.cloud_dataset], nshowers_2_plot
                 # Hit means
                 sum_e_shower.extend( [np.sum(all_e)] )
                 mean_x_shower.extend( [np.mean(all_x)] )
-                mean_y_shower.extend( [np.mean(all_y)] )
-                mean_z_shower.extend( [np.mean(all_z)] )
+                #mean_y_shower.extend( [np.mean(all_y)] )
+                #mean_z_shower.extend( [np.mean(all_z)] )
 
     return [entries, all_incident_e, shower_hit_ine, shower_hit_energies, shower_hit_x, shower_hit_y, all_z, sum_e_shower, mean_x_shower, mean_y_shower, mean_z_shower]
 
