@@ -405,7 +405,7 @@ class ScoreMatchingLoss(nn.Module):
         # register components of nn.Module to custom loss
         super(ScoreMatchingLoss, self).__init__()
         
-    def forward(self, model, x, incident_energies, marginal_prob_std , padding_value=0, eps=1e-3, device='cpu', diffusion_on_mask=False, serialized_model=False, cp_chunks=0):
+    def forward(self, model, x, incident_energies, marginal_prob_std , loss_list, ine_list,t_list, padding_value=0, eps=1e-3, device='cpu', diffusion_on_mask=False, serialized_model=False, cp_chunks=0):
         
         '''
         Forward method used to calculate value:
@@ -452,6 +452,10 @@ class ScoreMatchingLoss(nn.Module):
         # Mean the losses across all hits and 4-vectors (using sum, loss numerical value gets too large)
         losses = torch.square( scores*std_[:,None,None] + z )
         losses = torch.mean( losses, dim=(1,2) )
+
+        t_list.extend(random_t.cpu().numpy())
+        loss_list.extend(losses.cpu().numpy())
+        ine_list.extend(incident_energies.cpu().numpy())
 
         # Mean loss for batch
         batch_loss = torch.mean( losses )
