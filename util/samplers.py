@@ -152,6 +152,7 @@ class pc_sampler:
                 self.hist = hist_
 
             # Iterate through time steps
+            correlation = []
             for time_idx, time_step in enumerate(time_steps):
                 
                 # Input shower = noise * std from SDE
@@ -172,8 +173,8 @@ class pc_sampler:
                 self.step_scores[diffusion_step_].extend(grad[1,:,0].cpu().tolist() )
                 self.step_hite[diffusion_step_].extend(x[1,:,0].cpu().tolist())
                 self.step_hitx[diffusion_step_].extend(x[1,:,1].cpu().tolist())
-                self.step_hity[diffusion_step_].extend(x[1,:,2].cpu().tolist())
-                self.step_hitz[diffusion_step_].extend(x[1,:,3].cpu().tolist())
+                #self.step_hity[diffusion_step_].extend(x[1,:,2].cpu().tolist())
+                #self.step_hitz[diffusion_step_].extend(x[1,:,3].cpu().tolist())
                 
                 # Ensure the first set of values for plots are the unperturbed inputs
                 if diffusion_step_ == 0:
@@ -302,11 +303,11 @@ class pc_sampler:
                         step_hit_x.extend(all_x)
                         step_av_x_pos.extend( [av_x_position] )
                         
-                        all_y = x_mean[shower_idx,:,2].cpu().numpy().reshape(-1,1)
-                        av_y_position = np.mean( all_y )
-                        all_y = all_y.flatten().tolist()
-                        step_hit_y.extend(all_y)
-                        step_av_y_pos.extend( [av_y_position] )
+                        # all_y = x_mean[shower_idx,:,2].cpu().numpy().reshape(-1,1)
+                        # av_y_position = np.mean( all_y )
+                        # all_y = all_y.flatten().tolist()
+                        # step_hit_y.extend(all_y)
+                        # step_av_y_pos.extend( [av_y_position] )
                     self.incident_e_stages[diffusion_step_].extend(step_incident_e)
                     self.hit_energy_stages[diffusion_step_].extend(step_hit_e)
                     self.hit_x_stages[diffusion_step_].extend(step_hit_x)
@@ -322,13 +323,21 @@ class pc_sampler:
                 self.mean_e.append(torch.mean(non_zero_elements[:,0]).item())
                 self.mean_x.append(torch.mean(non_zero_elements[:,1]).item())
                 #print(torch.mean(non_zero_elements[:,2]).item())
-                self.mean_y.append(torch.mean(non_zero_elements[:,2]).item())
-                self.mean_z.append(torch.mean(non_zero_elements[:,3]).item())
+                #self.mean_y.append(torch.mean(non_zero_elements[:,2]).item())
+                #self.mean_z.append(torch.mean(non_zero_elements[:,3]).item())
                 self.std_e.append(torch.std(non_zero_elements[:,0]).item())
                 self.std_x.append(torch.std(non_zero_elements[:,1]).item())
-                self.std_y.append(torch.std(non_zero_elements[:,2]).item())
-                self.std_z.append(torch.std(non_zero_elements[:,3]).item())
-                
+                #self.std_y.append(torch.std(non_zero_elements[:,2]).item())
+                #self.std_z.append(torch.std(non_zero_elements[:,3]).item())
+                # Stack the two variables along a new dimension
+                stacked = torch.stack((non_zero_elements[:, 0], non_zero_elements[:, 1]))
+
+                # Compute the correlation coefficient matrix
+                correlation_matrix = torch.corrcoef(stacked)
+
+                # Extract the correlation between non_zero_elements[:, 0] and non_zero_elements[:, 1]
+                correlation = correlation.extend(correlation_matrix[0, 1])
+
                 
                 #print if there is any nan in mean
 
@@ -344,7 +353,7 @@ class pc_sampler:
                 diffusion_step_+=1
                 
         # Do not include noise in last step
-        return x_mean
+        return x_mean,correlation
 
 class new_pc_sampler:
     def __init__(self, sde, padding_value, snr=0.2, sampler_steps=100, steps2plot=(), device='cuda', eps=1e-3, jupyternotebook=False, serialized_model=False):

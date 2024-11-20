@@ -265,8 +265,8 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
     # Collect Geant4 shower information
     geant_e = []
     geant_x = []
-    geant_y = []
-    geant_z = []
+    # geant_y = []
+    # geant_z = []
     for file_idx in range(len(files_list_)):
 
         # N valid hits used for 2D PDF
@@ -330,15 +330,15 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
                     geant_x_pos.append( np.mean(all_x) )
                     geant_x.append(all_x)
                     
-                    all_y = valid_hits[:,2].reshape(-1,1)
-                    all_y = all_y.flatten().tolist()
-                    geant_y_pos.append( np.mean(all_y) )
-                    geant_y.append(all_y)
+                    # all_y = valid_hits[:,2].reshape(-1,1)
+                    # all_y = all_y.flatten().tolist()
+                    # geant_y_pos.append( np.mean(all_y) )
+                    # geant_y.append(all_y)
 
-                    all_z = valid_hits[:,3].reshape(-1,1)
-                    all_z = all_z.flatten().tolist()
-                    #geant_y_pos.append( np.mean(all_y) )
-                    geant_z.append(all_z)
+                    # all_z = valid_hits[:,3].reshape(-1,1)
+                    # all_z = all_z.flatten().tolist()
+                    # #geant_y_pos.append( np.mean(all_y) )
+                    # geant_z.append(all_z)
                     
 
                 N_geant_showers+=1
@@ -407,7 +407,7 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
             
             # Run reverse diffusion sampler
             #generative = sampler(model, marginal_prob_std_fn, diffusion_coeff_fn, sampled_energies, gen_hit, batch_size=gen_hit.shape[0], energy_trans_file=energy_trans_file, x_trans_file=x_trans_file , y_trans_file = y_trans_file, ine_trans_file=ine_trans_file)
-            generative = sampler(model, sampled_energies, gen_hit, batch_size=gen_hit.shape[0],corrector_steps = config.correction_steps)
+            generative,correlation = sampler(model, sampled_energies, gen_hit, batch_size=gen_hit.shape[0],corrector_steps = config.correction_steps)
             # Create first sample or concatenate sample to sample list
             if i == 0:
                 sample = generative
@@ -425,14 +425,22 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
     print(f'sample_: {len(sample_)}, sampled_ine: {len(sampled_ine)}')
     sample_savename = os.path.join(output_directory, 'sample.pt')
     torch.save([sample_,sampled_ine], sample_savename)
-    gen_end_time = time.time()
-    elapsed_time = gen_end_time - gen_start_time
-    gen_data = utils.cloud_dataset(sample_savename,device=device)
-    # Generated distributions
-    dists_gen = display.plot_distribution(gen_data, nshowers_2_plot=config.n_showers_2_gen, padding_value=0.0)
-    # Distributions object for Geant4 files
-    dists = display.plot_distribution(files_list_, nshowers_2_plot=config.n_showers_2_gen, padding_value=0.0)
-    comparison_fig = display.comparison_summary(dists, dists_gen, output_directory)#, erange=(-5,3), xrange=(-2.5,2.5), yrange=(-2.5,2.5), zrange=(0,1))
+    plt.figure(figsize=(8, 5))
+    plt.plot(correlation, marker='o', linestyle='-', label='Correlation')
+    plt.title("Correlation Over Time/Instances")
+    plt.xlabel("Index (e.g., Time or Instance)")
+    plt.ylabel("Correlation Coefficient")
+    plt.grid(True)
+    plt.legend()
+    plt.savefig(os.path.join(output_directory, 'correlation.png'))
+    # gen_end_time = time.time()
+    # elapsed_time = gen_end_time - gen_start_time
+    # gen_data = utils.cloud_dataset(sample_savename,device=device)
+    # # Generated distributions
+    # dists_gen = display.plot_distribution(gen_data, nshowers_2_plot=config.n_showers_2_gen, padding_value=0.0)
+    # # Distributions object for Geant4 files
+    # dists = display.plot_distribution(files_list_, nshowers_2_plot=config.n_showers_2_gen, padding_value=0.0)
+    # comparison_fig = display.comparison_summary(dists, dists_gen, output_directory)#, erange=(-5,3), xrange=(-2.5,2.5), yrange=(-2.5,2.5), zrange=(0,1))
     # Add evaluation plots to keep on wandb
     #et_correlation_gen = display.correlation(dists_gen[3],dists_gen[5],output_directory)
     #rt_correlation_gen = display.correlation(dists_gen[4],dists_gen[5],output_directory)
@@ -441,7 +449,7 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
     #score_fid = test.FID_score()
     #score_fid_4D = test.FID_score_4D()
     #wandb.log({"summary" : wandb.Image(comparison_fig),"FID_e" : score_fid[0], "FID_x" : score_fid[1], "FID_y" : score_fid[2], "FID_z" : score_fid[3], "FID" : score_fid_4D, "time_consuming" : elapsed_time})
-    wandb.log({"summary" : wandb.Image(comparison_fig)})
+    #wandb.log({"summary" : wandb.Image(comparison_fig)})
 
     
     #print(test_e)
