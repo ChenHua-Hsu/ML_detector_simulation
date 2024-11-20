@@ -139,6 +139,9 @@ def train_model(files_list_, device='cpu',serialized_model=False):
         file_counter = 0
         training_batches_per_epoch = 0
         testing_batches_per_epoch = 0
+        loss_list = []
+        t_list = []
+        ine_list = []
 
         # Load files
         for filename in files_list_:
@@ -182,8 +185,25 @@ def train_model(files_list_, device='cpu',serialized_model=False):
                     model.eval()
                     shower_data = shower_data.to(device)
                     incident_energies = incident_energies.to(device)
-                    test_loss = score_model.loss_fn(model, shower_data, incident_energies, marginal_prob_std_fn, padding_value=0.0, device=device,serialized_model=False, cp_chunks=4)
+                    test_loss = score_model.loss_fn(model, shower_data, incident_energies, marginal_prob_std_fn, loss_list, ine_list, t_list,padding_value=0.0, device=device,serialized_model=False, cp_chunks=4)
+        if epoch % 10 == 0: 
+            # Plotting code here
+            plt.figure(figsize=(8, 6))
+            scatter = plt.scatter(t_list, loss_list, c=ine_list, cmap='viridis', marker='o')
+            plt.colorbar(scatter, label='ine_list')
+            plt.xlabel('t_list')
+            plt.ylabel('loss_list')
+            #plt.title(f"2D Plot with Color Representing ine_list\n(B list: {B_list_name}\nEpoch: {str(C_epoch).zfill(3)})")
+            plt.title(f"2D Plot with Color Representing ine_list\nEpoch: {str(epoch).zfill(3)})")
 
+            loss_distribution = plt.gcf()
+            wandb.log({"loss_distribution": wandb.Image(loss_distribution)})
+            plt.close(loss_distribution)  # Close the figure to free up memory
+
+            # Clear lists to free up memory
+            t_list.clear()
+            loss_list.clear()
+            ine_list.clear()
         scheduler.step()
         
         # Save checkpoints
