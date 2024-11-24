@@ -177,7 +177,7 @@ class Gen(nn.Module):
         #e_encoded = e_encoded.view(-1, embed_dim)  # Reshape to ensure compatibility
 
         # Split e_encoded into e1 and e2 (each [128, embed_dim // 2])
-        e1, e2 = e_encoded[:, :self.embed_dim // 2], e_encoded[:, self.embed_dim // 2:]
+        e1, e2 = e_encoded[:, :self.embed_dim], e_encoded[:, self.embed_dim:]
 
         # Expand cls_token and modify x_cls
         #cls_token = nn.Parameter(torch.ones(1, 1, embed_dim), requires_grad=True)
