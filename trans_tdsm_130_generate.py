@@ -139,12 +139,15 @@ def train_model(files_list_, device='cpu',serialized_model=False):
         file_counter = 0
         training_batches_per_epoch = 0
         testing_batches_per_epoch = 0
-
+        test_loss_list = []
+        test_t_list = []
+        test_ine_list = []
+        training_loss_list = []
+        training_t_list = []
+        training_ine_list = []
         # Load files
         for filename in files_list_:
-            loss_list = []
-            t_list = []
-            ine_list = []
+            
             file_counter+=1
 
             # Build dataset
@@ -168,7 +171,7 @@ def train_model(files_list_, device='cpu',serialized_model=False):
                 # Zero any gradients from previous steps
                 optimiser.zero_grad()
                 # Loss average for each batch
-                loss = loss_fn(model, shower_data, incident_energies, marginal_prob_std_fn, padding_value=0.0, device=device, diffusion_on_mask=False,serialized_model=False, cp_chunks=4)
+                loss = loss_fn(model, shower_data, incident_energies, marginal_prob_std_fn, training_loss_list,training_ine_list,training_t_list,padding_value=0.0, device=device, diffusion_on_mask=False,serialized_model=False, cp_chunks=4)
                 # collect dL/dx for any parameters (x) which have requires_grad = True via: x.grad += dL/dx
                 loss.backward()
                 cumulative_epoch_loss+=loss.item()
@@ -185,29 +188,48 @@ def train_model(files_list_, device='cpu',serialized_model=False):
                     model.eval()
                     shower_data = shower_data.to(device)
                     incident_energies = incident_energies.to(device)
-                    test_loss = score_model.loss_fn(model, shower_data, incident_energies, marginal_prob_std_fn, loss_list= loss_list, ine_list = ine_list, t_list = t_list, padding_value=0.0, device=device,serialized_model=False, cp_chunks=4)
+                    test_loss = score_model.loss_fn(model, shower_data, incident_energies, marginal_prob_std_fn, loss_list= test_loss_list, ine_list = test_ine_list, t_list = test_t_list, padding_value=0.0, device=device,serialized_model=False, cp_chunks=4)
 
-            if epoch%10 == 0: 
-                # plot
-                # Assuming "B list" and "C epoch" are given as variables
-                B_list_name = filename  # Replace with the actual name
-                C_epoch = epoch  # Replace with the actual epoch number
+        if epoch%10 == 0: 
+            # plot
+            # Assuming "B list" and "C epoch" are given as variables
+            B_list_name = filename  # Replace with the actual name
+            C_epoch = epoch  # Replace with the actual epoch number
 
-                # Create a 2D scatter plot with color representing the third dimension (ine_list)
-                plt.figure(figsize=(8, 6))
-                scatter = plt.scatter(t_list, loss_list, c=ine_list, cmap='viridis', marker='o')
-                plt.colorbar(scatter, label='ine_list')  # Color bar to represent the third dimension
+            # Create a 2D scatter plot with color representing the third dimension (ine_list)
+            plt.figure(figsize=(8, 6))
+            scatter = plt.scatter(test_t_list, test_loss_list, c=test_ine_list, cmap='viridis', marker='o')
+            plt.colorbar(scatter, label='ine_list')  # Color bar to represent the third dimension
 
-                # Labeling the axes
-                plt.xlabel('t_list')
-                plt.ylabel('loss_list')
-                plt.title(f"2D Plot with Color Representing ine_list\n(B list: {B_list_name}\nEpoch: {str(C_epoch).zfill(3)})")
+            # Labeling the axes
+            plt.xlabel('t_list')
+            plt.ylabel('loss_list')
+            plt.title(f"2D Plot with Color Representing ine_list\n(B list: {B_list_name}\nEpoch: {str(C_epoch).zfill(3)})")
 
-                # Save plot to a figure
-                loss_distribution = plt.gcf()
+            # Save plot to a figure
+            loss_distribution = plt.gcf()
 
-                # Log the plot to wandb
-                wandb.log({"loss_distribution": wandb.Image(loss_distribution)})
+            # Log the plot to wandb
+            wandb.log({"test_loss_distribution": wandb.Image(loss_distribution)})
+            plt.close()
+
+            # Plot training loss
+            plt.figure(figsize=(8, 6))
+            plt.plot(range(len(training_loss_list)), training_loss_list, label="Training Loss", color='blue')
+            plt.xlabel('Epoch')
+            plt.ylabel('Training Loss')
+            plt.title(f"Training Loss Over Epochs\n(B list: {B_list_name}\nEpoch: {str(C_epoch).zfill(3)})")
+            plt.legend()
+            training_loss_plot = plt.gcf()  # Save the plot for logging
+            wandb.log({"training_loss_plot": wandb.Image(training_loss_plot)})
+            plt.close()  # Close the figure to prevent overlap
+
+            test_loss_list.clear()
+            test_t_list.clear()
+            test_ine_list.clear()
+            training_loss_list.clear()
+            training_t_list.clear()
+            training_ine_list.clear()
         scheduler.step()
         
         # Save checkpoints
@@ -636,7 +658,7 @@ def main(config=None):
     files_list_ = []
     print(f'Training files found in: {training_file_path}')
     for filename in os.listdir(training_file_path):
-        if fnmatch.fnmatch(filename,'dataset_2_padded_transform_incident_later_nentry1033To1161.pt'):
+        if fnmatch.fnmatch(filename,'dataset_2_padded_transform_incident_later_nentry*.pt'):
             files_list_.append(os.path.join(training_file_path,filename))
     print(f'Files: {files_list_}')
     
