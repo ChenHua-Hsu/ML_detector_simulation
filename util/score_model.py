@@ -27,6 +27,25 @@ class GaussianFourierProjection(nn.Module):
         gauss_out = torch.cat([torch.sin(time_proj), torch.cos(time_proj)], dim=-1)
         return gauss_out
 
+# Gaussian Fourier Projection Class
+class GaussianFourierProjection_e(nn.Module):
+    """Gaussian random features for encoding time steps"""
+    def __init__(self, embed_dim, scale=5):
+        super().__init__()
+        # Fixed weights for Fourier projection
+        self.W = nn.Parameter(torch.randn(embed_dim) * scale, requires_grad=False)
+
+    def forward(self, time):
+        # Project the input time steps
+        time_proj = time[:, None] * self.W[None, :] * 2 * np.pi
+        gauss_out = torch.cat([torch.sin(time_proj), torch.cos(time_proj)], dim=-1)
+        return gauss_out
+
+
+
+# x_cls now incorporates e1 and e2
+
+
 class Dense(nn.Module):
     """Fully connected layer that reshapes output of embedded conditional variable to feature maps"""
     def __init__(self, input_dim, output_dim):
@@ -140,6 +159,11 @@ class Gen(nn.Module):
         # Standard deviation of SDE
         self.marginal_prob_std = marginal_prob_std
         self.linear_e = nn.Linear(128, embed_dim)
+        # Instantiate the GaussianFourierProjection
+        self.gaussian_proj = GaussianFourierProjection_e(embed_dim=embed_dim)
+        self.embed_dim = embed_dim
+
+        
 
     def forward(self, x, t, e, mask=None):
         """
@@ -148,6 +172,18 @@ class Gen(nn.Module):
         e = conditional variable
         mask = padding mask for attention mechanism with 'True' indicating the corresponding key value will be ignored when calculating the attention.
         """
+        # Pass e through GaussianFourierProjection and reshape
+        e_encoded = self.gaussian_proj(e)  # Output shape [128, embed_dim]
+        #e_encoded = e_encoded.view(-1, embed_dim)  # Reshape to ensure compatibility
+
+        # Split e_encoded into e1 and e2 (each [128, embed_dim // 2])
+        e1, e2 = e_encoded[:, :self.embed_dim // 2], e_encoded[:, self.embed_dim // 2:]
+
+        # Expand cls_token and modify x_cls
+        #cls_token = nn.Parameter(torch.ones(1, 1, embed_dim), requires_grad=True)
+        #x_cls = cls_token.expand(e1.size(0), 1, embed_dim)  # Ensure x_cls has batch size from e
+
+        # Adjust x_cls using e1 and e2
         
         # Embed 4-vector input 
         x = self.embed(x)
@@ -157,13 +193,14 @@ class Gen(nn.Module):
         embed_e_ = self.act_sig( self.embed_e(e) )
         # 'class' token (mean field)
         x_cls = self.cls_token.expand(x.size(0), 1, -1)
+        x_cls = e1.unsqueeze(1) * x_cls + e2.unsqueeze(1)
 
         #x_cls = x_cls*e
 
         #e = e.unsqueeze(0).unsqueeze(1)
         #e = self.linear_e(e)
-        e = e.unsqueeze(1).unsqueeze(2).expand(-1, 1, x_cls.size(-1))
-        x_cls = x_cls * e
+        #e = e.unsqueeze(1).unsqueeze(2).expand(-1, 1, x_cls.size(-1))
+        #x_cls = x_cls * e
         
         
         # Feed input embeddings into encoder block
