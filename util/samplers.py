@@ -142,7 +142,7 @@ class pc_sampler:
             # Matrix multiplication in GaussianFourier projection doesnt like float64
             sampled_energies = sampled_energies.to(x.device, torch.float32)
             # Noise to add to input
-            z = torch.normal(0,1,size=x.shape, device=x.device)
+            z = torch.normal(0,1,size=x.shape, device=x.device)*0.1
            
             # Diffusion flow plot
             x_to_hist = x[:,:,0].view(-1).cpu().numpy().copy()

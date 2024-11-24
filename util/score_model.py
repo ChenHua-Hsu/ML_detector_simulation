@@ -326,7 +326,7 @@ def loss_fn(model, x, incident_energies, marginal_prob_std ,loss_list, ine_list,
     mean_, std_ = marginal_prob_std(x,random_t)
     
     # Noise
-    z = torch.normal(0,1,size=x.shape, device=device)
+    z = torch.normal(0,1,size=x.shape, device=device)*0.1
     if not diffusion_on_mask:
       z = z*mask_tensor
       
@@ -474,7 +474,7 @@ class ScoreMatchingLoss_addcorrealtion(nn.Module):
         mean_, std_ = marginal_prob_std(x,random_t)
 
         # Noise
-        z = torch.normal(0,1,size=x.shape, device=device)
+        z = torch.normal(0,1,size=x.shape, device=device)*0.1
         if not diffusion_on_mask:
           z = z*mask_tensor
 
