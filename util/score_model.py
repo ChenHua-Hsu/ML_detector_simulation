@@ -395,7 +395,7 @@ class ScoreMatchingLoss(nn.Module):
         attn_padding_mask = (x[:,:,0] == 0).type(torch.bool)
 
         # Tensor of randomised 'time' steps
-        random_t = torch.rand(incident_energies.shape[0], device=device) * (1. - eps) + eps
+        random_t = (torch.rand(incident_energies.shape[0], device=device) * (1. - eps) + eps)*0.1
 
         # Mask to avoid perturbing padded entries
         #input_mask = (x[:,:,0] != 0).unsqueeze(-1)
