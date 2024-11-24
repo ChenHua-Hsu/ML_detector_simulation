@@ -215,13 +215,15 @@ def train_model(files_list_, device='cpu',serialized_model=False):
 
             # Plot training loss
             plt.figure(figsize=(8, 6))
-            plt.plot(range(len(training_loss_list)), training_loss_list, label="Training Loss", color='blue')
-            plt.xlabel('Epoch')
-            plt.ylabel('Training Loss')
-            plt.title(f"Training Loss Over Epochs\n(B list: {B_list_name}\nEpoch: {str(C_epoch).zfill(3)})")
-            plt.legend()
-            training_loss_plot = plt.gcf()  # Save the plot for logging
-            wandb.log({"training_loss_plot": wandb.Image(training_loss_plot)})
+            scatter = plt.scatter(training_t_list, training_loss_list, c=training_ine_list, cmap='viridis', marker='o')
+            plt.colorbar(scatter, label='ine_list')  # Color bar to represent the third dimension
+            plt.xlabel('t_list')
+            plt.ylabel('loss_list')
+            plt.title(f"2D Plot with Color Representing ine_list\n(B list: {B_list_name}\nEpoch: {str(C_epoch).zfill(3)})")
+
+            # Save plot to a figure
+            training_loss_distribution = plt.gcf()  # Save the plot for logging
+            wandb.log({"training_loss_plot": wandb.Image(training_loss_distribution)})
             plt.close()  # Close the figure to prevent overlap
 
             test_loss_list.clear()
