@@ -358,9 +358,9 @@ def loss_fn(model, x, incident_energies, marginal_prob_std ,loss_list, ine_list,
     # Mean the losses across all hits and 4-vectors (using sum, loss numerical value gets too large)
     losses = torch.mean( losses, dim=(1,2) )
 
-    t_list.extend(random_t.cpu().numpy())
-    loss_list.extend(losses.cpu().numpy())
-    ine_list.extend(incident_energies.cpu().numpy())
+    t_list.extend(random_t.cpu().detach().numpy())
+    loss_list.extend(losses.cpu().detach().numpy())
+    ine_list.extend(incident_energies.cpu().detach().numpy())
 
     # Mean loss for batch
     batch_loss = torch.mean( losses )
@@ -427,9 +427,9 @@ class ScoreMatchingLoss(nn.Module):
         # Mean the losses across all hits and 4-vectors (using sum, loss numerical value gets too large)
         losses = torch.square( scores*std_[:,None,None] + z )
         losses = torch.mean( losses, dim=(1,2) )
-        t_list.extend(random_t.cpu().numpy())
-        loss_list.extend(losses.cpu().numpy())
-        ine_list.extend(incident_energies.cpu().numpy())
+        t_list.extend(random_t.cpu().detach().numpy())
+        loss_list.extend(losses.cpu().detach().numpy())
+        ine_list.extend(incident_energies.cpu().detach().numpy())
 
         # Mean loss for batch
         batch_loss = torch.mean( losses )
