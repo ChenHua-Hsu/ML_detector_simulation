@@ -142,6 +142,9 @@ def train_model(files_list_, device='cpu',serialized_model=False):
         loss_list = []
         t_list = []
         ine_list = []
+        training_loss_list = []
+        training_t_list = []
+        training_ine_list = []
 
         # Load files
         for filename in files_list_:
@@ -168,7 +171,7 @@ def train_model(files_list_, device='cpu',serialized_model=False):
                 # Zero any gradients from previous steps
                 optimiser.zero_grad()
                 # Loss average for each batch
-                loss = loss_fn(model, shower_data, incident_energies, marginal_prob_std_fn, padding_value=0.0, device=device, diffusion_on_mask=False,serialized_model=False, cp_chunks=4)
+                loss = loss_fn(model, shower_data, incident_energies, marginal_prob_std_fn, training_loss_list,training_ine_list,training_t_list,padding_value=0.0, device=device, diffusion_on_mask=False,serialized_model=False, cp_chunks=4)
                 # collect dL/dx for any parameters (x) which have requires_grad = True via: x.grad += dL/dx
                 loss.backward()
                 cumulative_epoch_loss+=loss.item()
@@ -200,10 +203,24 @@ def train_model(files_list_, device='cpu',serialized_model=False):
             wandb.log({"loss_distribution": wandb.Image(loss_distribution)})
             plt.close(loss_distribution)  # Close the figure to free up memory
 
+            plt.figure(figsize=(8, 6))
+            scatter = plt.scatter(training_t_list, training_loss_list, c=training_ine_list, cmap='viridis', marker='o')
+            plt.colorbar(scatter, label='training_ine_list')
+            plt.xlabel('training_t_list')
+            plt.ylabel('training_loss_list')
+            #plt.title(f"2D Plot with Color Representing ine_list\n(B list: {B_list_name}\nEpoch: {str(C_epoch).zfill(3)})")
+            plt.title(f"2D Plot with Color Representing training_ine_list\nEpoch: {str(epoch).zfill(3)})")
+
+            training_loss_distribution = plt.gcf()
+            wandb.log({"training_loss_distribution": wandb.Image(training_loss_distribution)})
+
             # Clear lists to free up memory
             t_list.clear()
             loss_list.clear()
             ine_list.clear()
+            training_t_list.clear()
+            training_loss_list.clear()
+            training_ine_list.clear()
         scheduler.step()
         
         # Save checkpoints
