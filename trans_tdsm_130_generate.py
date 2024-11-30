@@ -200,7 +200,7 @@ def train_model(files_list_, device='cpu',serialized_model=False):
             plt.title(f"2D Plot with Color Representing ine_list\nEpoch: {str(epoch).zfill(3)})")
 
             loss_distribution = plt.gcf()
-            wandb.log({"loss_distribution": wandb.Image(loss_distribution)})
+            #wandb.log({"loss_distribution": wandb.Image(loss_distribution)})
             plt.close(loss_distribution)  # Close the figure to free up memory
 
             plt.figure(figsize=(8, 6))
@@ -212,7 +212,7 @@ def train_model(files_list_, device='cpu',serialized_model=False):
             plt.title(f"2D Plot with Color Representing training_ine_list\nEpoch: {str(epoch).zfill(3)})")
 
             training_loss_distribution = plt.gcf()
-            wandb.log({"training_loss_distribution": wandb.Image(training_loss_distribution)})
+            #wandb.log({"training_loss_distribution": wandb.Image(training_loss_distribution)})
 
             # Clear lists to free up memory
             t_list.clear()
