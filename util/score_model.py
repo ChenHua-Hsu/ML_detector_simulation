@@ -33,7 +33,7 @@ class GaussianFourierProjection_e(nn.Module):
     def __init__(self, embed_dim, scale=5):
         super().__init__()
         # Fixed weights for Fourier projection
-        self.W = nn.Parameter(torch.randn(embed_dim) * scale, requires_grad=False)
+        self.W = nn.Parameter(torch.randn(embed_dim) * scale, requires_grad=True)
 
     def forward(self, time):
         # Project the input time steps
