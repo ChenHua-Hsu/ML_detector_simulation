@@ -170,7 +170,7 @@ class Gen(nn.Module):
         
         # Rescale models output (helps capture the normalisation of the true scores)
         mean_ , std_ = self.marginal_prob_std(x,t)
-        output = self.out(x) / std_[:, None, None]
+        output = self.out(x)
         return output
 
 ############################################
