@@ -38,7 +38,7 @@ if __name__ == '__main__':
   CWD = os.getcwd()
   sweep_yml['program'] = os.path.join(CWD, args.python_cfg)
   sweep_yml['parameters']['work_dir'] = {'value': CWD}
-  sweep_yml['parameters']['switches'] = {'value': '0110'}
+  sweep_yml['parameters']['switches'] = {'value': '0100'}
   sweep_yml['parameters']['condor']   = {'value': 1}
   sweep_yml['parameters']['inputs']= {'value': os.path.join(CWD, "dataset_e_r")}
   sweep_yml['parameters']['preprocessor'] = {'value': os.path.join(CWD, "dataset_e_r/dataset_2_padded_transform_incident_later_nentry2065To2193_preprocessor.pkl")}
