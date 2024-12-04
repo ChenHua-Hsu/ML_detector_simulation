@@ -117,7 +117,7 @@ class pc_sampler:
             pred_nhits.append(nhits)
             # Generate random values for features in all hits
             #ytmp = torch.normal(0,1,size=(nhits, n_features), device=device)
-            ytmp = self.sde.prior_sampling((nhits,4))
+            ytmp = self.sde.prior_sampling((nhits,2))
             y_pred.append( ytmp )
         return pred_nhits, y_pred
     
@@ -202,18 +202,18 @@ class pc_sampler:
                         step_hit_x.extend(all_x)
                         step_av_x_pos.extend( [av_x_position] )
                         
-                        all_y = x[shower_idx,:,2].cpu().numpy().reshape(-1,1)
-                        av_y_position = np.mean( all_y )
-                        all_y = all_y.flatten().tolist()
-                        step_hit_y.extend(all_y)
-                        step_av_y_pos.extend( [av_y_position] )
+                        # all_y = x[shower_idx,:,2].cpu().numpy().reshape(-1,1)
+                        # av_y_position = np.mean( all_y )
+                        # all_y = all_y.flatten().tolist()
+                        # step_hit_y.extend(all_y)
+                        # step_av_y_pos.extend( [av_y_position] )
                     self.incident_e_stages[diffusion_step_].extend(step_incident_e)
                     self.hit_energy_stages[diffusion_step_].extend(step_hit_e)
                     self.hit_x_stages[diffusion_step_].extend(step_hit_x)
-                    self.hit_y_stages[diffusion_step_].extend(step_hit_y)
+                    # self.hit_y_stages[diffusion_step_].extend(step_hit_y)
                     self.deposited_energy_stages[diffusion_step_].extend(step_deposited_energy)
                     self.av_x_stages[diffusion_step_].extend(step_av_x_pos)
-                    self.av_y_stages[diffusion_step_].extend(step_av_y_pos)
+                    # self.av_y_stages[diffusion_step_].extend(step_av_y_pos)
                 
                 # Corrector step (Langevin MCMC)
                 for n_ in range(nc_steps):
@@ -336,7 +336,7 @@ class pc_sampler:
                 correlation_matrix = torch.corrcoef(stacked)
 
                 # Extract the correlation between non_zero_elements[:, 0] and non_zero_elements[:, 1]
-                correlation = correlation.extend(correlation_matrix[0, 1])
+                correlation = correlation.extend(correlation_matrix)
 
                 
                 #print if there is any nan in mean

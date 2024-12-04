@@ -366,6 +366,8 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
                     all_x = all_x.flatten().tolist()
                     geant_x_pos.append( np.mean(all_x) )
                     geant_x.append(all_x)
+
+                    #print(valid_hits.shape)
                     
                     # all_y = valid_hits[:,2].reshape(-1,1)
                     # all_y = all_y.flatten().tolist()
