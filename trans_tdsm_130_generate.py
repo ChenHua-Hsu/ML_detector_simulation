@@ -43,10 +43,10 @@ sys.path.insert(2, 'toy_model')
 import data_utils as utils
 import score_model as score_model
 import sdes as sdes
-import display_remove_tail as display 
+import display as display 
 import samplers as samplers
-import Convertor as Convertor
-from Convertor import Preprocessor
+import Convertor_quantile as Convertor
+from Convertor_quantile import Preprocessor
 #import fid_score1 as fid_score1
 
 
@@ -612,7 +612,7 @@ def main(config=None):
     files_list_ = []
     print(f'Training files found in: {training_file_path}')
     for filename in os.listdir(training_file_path):
-        if fnmatch.fnmatch(filename, 'dataset_2_padded_transform*.pt'):
+        if fnmatch.fnmatch(filename, 'dataset_2_padded_transform_incident_later_nentry130To258.pt'):
             files_list_.append(os.path.join(training_file_path,filename))
     print(f'Files: {files_list_}')
     
