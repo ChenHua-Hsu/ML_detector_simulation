@@ -45,8 +45,8 @@ import score_model as score_model
 import sdes as sdes
 import display as display 
 import samplers as samplers
-import Convertor_quantile as Convertor
-from Convertor_quantile import Preprocessor
+import Convertor_robust as Convertor
+from Convertor_robust import Preprocessor
 #import fid_score1 as fid_score1
 
 
@@ -81,7 +81,7 @@ def train_model(files_list_, device='cpu',serialized_model=False):
 
     wd = os.getcwd()
     #wd = '/afs/cern.ch/work/j/jthomasw/private/NTU/fast_sim/tdsm_encoder/'
-    output_files = './training_result/training_quantile_fulldataset'+datetime.now().strftime('%Y%m%d_%H%M')+'_output/'
+    output_files = './training_result/training_robust_fulldataset'+datetime.now().strftime('%Y%m%d_%H%M')+'_output/'
     output_directory = os.path.join(wd, output_files)
     print('Training directory: ', output_directory)
     if not os.path.exists(output_directory):
@@ -198,7 +198,7 @@ def train_model(files_list_, device='cpu',serialized_model=False):
 def generate(files_list_, load_filename, device='cpu', serialized_model=False):
 
     wd = os.getcwd()
-    output_file = './sampling_result/sampling_quantile_fulldataset'+datetime.now().strftime('%Y%m%d_%H%M')+'_output/'
+    output_file = './sampling_result/sampling_robust_fulldataset'+datetime.now().strftime('%Y%m%d_%H%M')+'_output/'
     output_directory = os.path.join(wd, output_file)
     print('Sampling directory: ', output_directory)
     if not os.path.exists(output_directory):

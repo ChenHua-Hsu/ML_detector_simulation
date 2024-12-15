@@ -22,7 +22,7 @@ def prepare_shell(shell_file, command, condor, FarmDir, afs_dir):
 if __name__ == '__main__':
   usage = 'usage: %prog[options]'
   parser = argparse.ArgumentParser(description=usage)
-  parser.add_argument('--config_file', type=str, default = '/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/configs/quantile_fulldataset.yml',help = 'configuration file for wandb')
+  parser.add_argument('--config_file', type=str, default = '/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/configs/robust_fulldataset.yml',help = 'configuration file for wandb')
   parser.add_argument('--python_cfg', type=str, default = 'trans_tdsm_130_generate.py', help = 'python file to run the code')
   parser.add_argument('--n_run', type=int, default = 2, help = 'number of runs')
   parser.add_argument('--dryRun', action='store_true', help = 'not submit to condor')
@@ -40,8 +40,8 @@ if __name__ == '__main__':
   sweep_yml['parameters']['work_dir'] = {'value': CWD}
   sweep_yml['parameters']['switches'] = {'value': '1110'}
   sweep_yml['parameters']['condor']   = {'value': 1}
-  sweep_yml['parameters']['inputs']= {'value': os.path.join(CWD, "full_quantile_dataset")}
-  sweep_yml['parameters']['preprocessor'] = {'value': os.path.join(CWD, "full_quantile_dataset/dataset_2_padded_transform_incident_later_nentry130To258_preprocessor.pkl")}
+  sweep_yml['parameters']['inputs']= {'value': os.path.join(CWD, "full_robust_dataset")}
+  sweep_yml['parameters']['preprocessor'] = {'value': os.path.join(CWD, "full_robust_dataset/dataset_2_padded_transform_incident_later_nentry130To258_preprocessor.pkl")}
 
 
   # Create necessary work space in afs space (condor can not be submitted from eos space)
