@@ -81,7 +81,7 @@ def train_model(files_list_, device='cpu',serialized_model=False):
 
     wd = os.getcwd()
     #wd = '/afs/cern.ch/work/j/jthomasw/private/NTU/fast_sim/tdsm_encoder/'
-    output_files = './training_result/training_'+datetime.now().strftime('%Y%m%d_%H%M')+'_output/'
+    output_files = './training_result/training_quantile_fulldataset'+datetime.now().strftime('%Y%m%d_%H%M')+'_output/'
     output_directory = os.path.join(wd, output_files)
     print('Training directory: ', output_directory)
     if not os.path.exists(output_directory):
@@ -198,7 +198,7 @@ def train_model(files_list_, device='cpu',serialized_model=False):
 def generate(files_list_, load_filename, device='cpu', serialized_model=False):
 
     wd = os.getcwd()
-    output_file = './sampling_result/sampling_'+datetime.now().strftime('%Y%m%d_%H%M')+'_output/'
+    output_file = './sampling_result/sampling_quantile_fulldataset'+datetime.now().strftime('%Y%m%d_%H%M')+'_output/'
     output_directory = os.path.join(wd, output_file)
     print('Sampling directory: ', output_directory)
     if not os.path.exists(output_directory):
@@ -612,7 +612,7 @@ def main(config=None):
     files_list_ = []
     print(f'Training files found in: {training_file_path}')
     for filename in os.listdir(training_file_path):
-        if fnmatch.fnmatch(filename, 'dataset_2_padded_transform_incident_later_nentry130To258.pt'):
+        if fnmatch.fnmatch(filename, 'dataset_2_padded_transform_incident_later_nentry*.pt'):
             files_list_.append(os.path.join(training_file_path,filename))
     print(f'Files: {files_list_}')
     
