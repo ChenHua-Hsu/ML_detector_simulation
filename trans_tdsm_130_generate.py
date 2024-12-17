@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 plt.rcdefaults()
 plt.rcParams['text.usetex'] = False
 plt.rcParams['font.family'] = 'serif'  # Optional: Change to a LaTeX-compatible font
-plt.rcParams['mathtext.fontset'] = 'cm'
+plt.rcParams['mathtext.fontset'] = 'stix'
 
 from prettytable import PrettyTable
 #torch.manual_seed(1234)
@@ -43,7 +43,7 @@ sys.path.insert(2, 'toy_model')
 import data_utils as utils
 import score_model as score_model
 import sdes as sdes
-import display as display 
+import display_remove_tail as display 
 import samplers as samplers
 import Convertor_quantile as Convertor
 from Convertor_quantile import Preprocessor
@@ -720,7 +720,7 @@ def main(config=None):
             # n.b. you'll need to make sure the config hyperparams are the same as the model being used
             else:
 #                trained_model_name = 'training_20240408_1350_output/ckpt_tmp_299.pth'
-                trained_model_name = '/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/training_result/training_epoch_1000_different_shower20240901_1209_output/ckpt_tmp_500.pth'
+                trained_model_name = '/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/training_result/training_quantile_fulldataset20241215_1512_output/ckpt_tmp_199.pth'
                 output_directory = generate(files_list_, load_filename=trained_model_name, device=device)
             
 
@@ -731,7 +731,7 @@ def main(config=None):
             workingdir = os.getcwd()
             #out = './'
             if not switches_>>2 & trigger:
-              output_directory = os.path.join(workingdir,'sampling_result/sampling_20240701_1628_output')
+              output_directory = os.path.join(workingdir,'sampling_result/sampling_quantile_fulldataset20241216_0942_output')
             #output_directory = os.path.join(workingdir,'sampling_20240708_2258_output')
             print(f'Evaluation outputs stored here: {output_directory}')
             plot_file_name = os.path.join(output_directory, 'sample.pt')
