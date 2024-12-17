@@ -43,7 +43,7 @@ sys.path.insert(2, 'toy_model')
 import data_utils as utils
 import score_model as score_model
 import sdes as sdes
-import display_remove_tail as display 
+import display_doesnot_remove_tail as display 
 import samplers as samplers
 import Convertor_quantile as Convertor
 from Convertor_quantile import Preprocessor
