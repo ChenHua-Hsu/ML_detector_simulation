@@ -198,7 +198,7 @@ def train_model(files_list_, device='cpu',serialized_model=False):
 def generate(files_list_, load_filename, device='cpu', serialized_model=False):
     sample_savename = '/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/sampling_result/sampling_quantile_fulldataset20241216_0942_output/sample.pt'
     output_directory = '/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/sampling_result/sampling_quantile_fulldataset20241216_0942_output/'
-    gen_data = utils.cloud_dataset(sample_savename,device=device)
+    #gen_data = utils.cloud_dataset(sample_savename,device=device)
     # Generated distributions
     #dists_gen = display.plot_distribution(gen_data, nshowers_2_plot=100, padding_value=0.0)
     # Distributions object for Geant4 files
