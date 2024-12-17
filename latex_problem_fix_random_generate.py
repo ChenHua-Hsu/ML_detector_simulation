@@ -206,7 +206,7 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
 
     
     #generate ramdome data
-    z = torch.normal(0,1,size=100)
+    z = torch.rand(100)
     dists = [z,z,z,z,z,z,z,z,z,z,z]
     #dists = display.plot_distribution(files_list_, nshowers_2_plot=100, padding_value=0.0)
     comparison_fig = display.comparison_summary(dists, dists, output_directory)#, erange=(-5,3), xrange=(-2.5,2.5), yrange=(-2.5,2.5), zrange=(0,1))
