@@ -781,7 +781,7 @@ def comparison_summary(dists, dists_gen, sampling_directory, erange=(), xrange=(
     #ax[0][2].set_ylabel('entries')
     #ax[0][2].set_xlabel('Hit x position')
     all_x_gen = np.array(all_x_gen)
-    all_x_gen = all_x_gen[(all_x_gen<=1) & (all_x_gen>=0)]
+    all_x_gen = all_x_gen[(all_x_gen<=15) & (all_x_gen>=-5)]
     if len(xrange) == 0:
         bins=np.histogram(np.hstack((all_x,all_x_gen)), bins=50)[1]
         ax[0][2].hist(all_x, bins=bins, alpha=0.5, color='orange', label='Geant4')
@@ -795,7 +795,7 @@ def comparison_summary(dists, dists_gen, sampling_directory, erange=(), xrange=(
     #ax[1][0].set_ylabel('entries')
     #ax[1][0].set_xlabel('Hit y position')
     all_y_gen = np.array(all_y_gen)
-    all_y_gen = all_y_gen[(all_y_gen<=1) & (all_y_gen>=0)]
+    all_y_gen = all_y_gen[(all_y_gen<=15) & (all_y_gen>=-5)]
     if len(yrange)==0:
         bins=np.histogram(np.hstack((all_y,all_y_gen)), bins=50)[1]
         ax[1][0].hist(all_y, bins=bins, alpha=0.5, color='orange', label='Geant4')
