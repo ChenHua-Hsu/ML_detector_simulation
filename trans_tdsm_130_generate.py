@@ -720,7 +720,7 @@ def main(config=None):
             # n.b. you'll need to make sure the config hyperparams are the same as the model being used
             else:
 #                trained_model_name = 'training_20240408_1350_output/ckpt_tmp_299.pth'
-                trained_model_name = '/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/training_result/training_20241215_1404_output/ckpt_tmp_199.pth'
+                trained_model_name = '/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/training_result/training_20241210_0220_output/ckpt_tmp_199.pth'
                 output_directory = generate(files_list_, load_filename=trained_model_name, device=device)
             
 
