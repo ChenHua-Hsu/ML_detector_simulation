@@ -10,6 +10,7 @@ import pickle
 #sys.path.insert(1, '../')
 sys.path.insert(0, 'util')
 os.system('pwd')
+import joblib  # For saving and loading models
 #sys.path.insert(0, './')
 import data_utils, psutil
 from Convertor import Preprocessor
@@ -45,7 +46,7 @@ def main():
     
     # For each file
     for infile in os.listdir(indir):
-        if fnmatch.fnmatch(infile, 'dataset_2_tensor_no_padding_euclidian_nentry5548To5676.pt'):
+        if fnmatch.fnmatch(infile, 'dataset_2_tensor_no_padding_euclidian_nentry13*.pt'):
             filename = os.path.join(indir,infile)
             ofile = infile.replace("tensor_no_padding_euclidian", "padded_transform_incident_later" )
             opath = './'
@@ -132,6 +133,14 @@ def main():
                   W_ = E_flat_ / total_E_
                 
                 if transform == 1:
+                    #transformer = joblib.load("quantile_transformer.pkl")
+                    #X_ = np.asarray(X_).reshape(-1,1)
+                    #Y_ = np.asarray(Y_).reshape(-1,1)
+                    #transformer.fit(X_)
+                    #transformer.fit(Y_)
+
+                    # Step 2: Save the fitted transformer to a file
+                    #joblib.dump(transformer, "quantile_transformer.pkl")
                     E_, X_, Y_, Z_ = preprocessor.transform(E_, X_, Y_, Z_, incident_energies[ievent])
                     
                 E_ = torch.from_numpy( E_.flatten() )
@@ -233,7 +242,6 @@ def main():
             print(f'Number of NAN values in all_y: {np.isnan(all_y).sum()}')
             print(f'Number of NAN values in all_z: {np.isnan(all_z).sum()}')
             print(f'Number of NAN values in all_e: {np.isnan(all_e).sum()}')
-
             
             bins = np.linspace(0,10,100)
             #bins = np.linspace(np.min(data), np.max(data), 50)
