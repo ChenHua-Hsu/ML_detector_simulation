@@ -38,10 +38,10 @@ if __name__ == '__main__':
   CWD = os.getcwd()
   sweep_yml['program'] = os.path.join(CWD, args.python_cfg)
   sweep_yml['parameters']['work_dir'] = {'value': CWD}
-  sweep_yml['parameters']['switches'] = {'value': '1100'}
+  sweep_yml['parameters']['switches'] = {'value': '1110'}
   sweep_yml['parameters']['condor']   = {'value': 1}
-  sweep_yml['parameters']['inputs']= {'value': os.path.join(CWD, "full_quantile_dataset")}
-  sweep_yml['parameters']['preprocessor'] = {'value': os.path.join(CWD, "full_quantile_dataset/dataset_2_padded_transform_incident_later_nentry130To258_preprocessor.pkl")}
+  sweep_yml['parameters']['inputs']= {'value': os.path.join(CWD, "quantile_modified")}
+  sweep_yml['parameters']['preprocessor'] = {'value': os.path.join(CWD, "quantile_modified/dataset_2_padded_transform_incident_later_nentry130To258_preprocessor.pkl")}
 
 
   # Create necessary work space in afs space (condor can not be submitted from eos space)
