@@ -251,7 +251,7 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
     
     n_files = len(files_list_)
     print(f'n_files: {n_files}')
-    nshowers_per_file = [1311,6685,774,613,615]
+    nshowers_per_file = [6557,33427,3872,3067,3077]#[1311,6685,774,613,615]
     #r_ = config.n_showers_2_gen % nshowers_per_file[0]
     #nshowers_per_file[-1] = nshowers_per_file[-1]+r_
     shower_counter = 0
@@ -720,7 +720,7 @@ def main(config=None):
             # n.b. you'll need to make sure the config hyperparams are the same as the model being used
             else:
 #                trained_model_name = 'training_20240408_1350_output/ckpt_tmp_299.pth'
-                trained_model_name = '/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/training_result/training_quantile_fulldataset20241215_1512_output/ckpt_tmp_199.pth'
+                trained_model_name = '/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/training_result/training_quantile_fulldataset20241223_0406_output/ckpt_tmp_499.pth'
                 output_directory = generate(files_list_, load_filename=trained_model_name, device=device)
             
 
@@ -731,7 +731,7 @@ def main(config=None):
             workingdir = os.getcwd()
             #out = './'
             if not switches_>>2 & trigger:
-              output_directory = os.path.join(workingdir,'/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/sampling_result/sampling_quantile_fulldataset20241217_1520_output')
+              output_directory = os.path.join(workingdir,'/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/sampling_result/sampling_quantile_fulldataset20241229_0352_output')
             #output_directory = os.path.join(workingdir,'sampling_20240708_2258_output')
             print(f'Evaluation outputs stored here: {output_directory}')
             plot_file_name = os.path.join(output_directory, 'sample.pt')

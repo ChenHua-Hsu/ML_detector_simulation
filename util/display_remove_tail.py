@@ -153,7 +153,7 @@ def plot_distribution(files_:Union[ list , utils.cloud_dataset], nshowers_2_plot
         # Using several files so want to take even # samples from each file for plots
         n_files = len(files_)
         print(f'# files: {n_files}')
-        nshowers_per_file = [1311,6685,774,613,615]
+        nshowers_per_file = [6557,33427,3872,3067,3077]#[1311,6685,774,613,615]
         #r_ = nshowers_2_plot % nshowers_per_file[0]
         #nshowers_per_file[-1] = nshowers_per_file[-1]+r_
         print(f'# showers per file: {nshowers_per_file}')
@@ -1050,7 +1050,7 @@ class High_class_feature_plot_test:
         self.shower_nums = []
 
         i = 0 
-        self.batches = [1311,6685,774,613,615]#[1311,615,613,774,6685,2]#[774,613,2,6685,615,1311]
+        self.batches = [6557,33427,3872,3067,3077]#[1311,6685,774,613,615]#[1311,615,613,774,6685,2]#[774,613,2,6685,615,1311]
         # Load and concatenate all reference files, and keep track of shower counts
         for ref_file in reference_files:
             print(ref_file)

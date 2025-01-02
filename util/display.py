@@ -325,7 +325,7 @@ def perturbation_1D(distributions, titles, outdir=''):
     save_name = save_name.replace(' ','').replace('[','').replace(']','')
     save_name = os.path.join(outdir,save_name)
     print(f'save_name: {save_name}')
-    fig.savefig(save_name)
+    fig.savefig(save_name, dpi = 1200)
     return
 
 def create_axes():
