@@ -167,6 +167,16 @@ def train_model(files_list_, device='cpu',serialized_model=False):
                 # Loss average for each batch
                 loss = loss_fn(model, shower_data, incident_energies, marginal_prob_std_fn, padding_value=0.0, device=device, diffusion_on_mask=False,serialized_model=False, cp_chunks=4)
                 # collect dL/dx for any parameters (x) which have requires_grad = True via: x.grad += dL/dx
+                if file_counter == 1:
+                    loss = loss * 1.0
+                elif file_counter == 2:
+                    loss = loss * 0.2
+                elif file_counter == 3:
+                    loss = loss * 1.84
+                elif file_counter == 4:
+                    loss = loss * 2.13
+                elif file_counter == 5:
+                    loss = loss * 2.13
                 loss.backward()
                 cumulative_epoch_loss+=loss.item()
                 # Update value of x += -lr * x.grad
