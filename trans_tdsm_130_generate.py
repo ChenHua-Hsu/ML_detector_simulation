@@ -53,13 +53,24 @@ from Convertor import Preprocessor
 def train_log(loss, batch_ct, epoch):
     wandb.log({"epoch": epoch, "loss": loss}, step=batch_ct)
 
-def build_dataset(filename, train_ratio, batch_size, device):
+def build_dataset(filename, train_ratio, batch_size, device, max_batches=None):
+    """
+    Build dataset and optionally limit the number of batches.
+    """
     # Build dataset
     custom_data = utils.cloud_dataset(filename, device=device)
-    #custom_data.clean(20)
     train_size = int(train_ratio * len(custom_data.data))
     test_size = len(custom_data.data) - train_size
     train_dataset, test_dataset = torch.utils.data.random_split(custom_data, [train_size, test_size])
+
+    # Limit the dataset to max_batches
+    if max_batches is not None:
+        train_limit = max_batches * batch_size
+        test_limit = max_batches * batch_size
+        train_dataset = torch.utils.data.Subset(train_dataset, range(min(train_limit, len(train_dataset))))
+        test_dataset = torch.utils.data.Subset(test_dataset, range(min(test_limit, len(test_dataset))))
+
+    # Data loaders
     shower_loader_train = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     shower_loader_test = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
     return shower_loader_train, shower_loader_test
@@ -145,7 +156,7 @@ def train_model(files_list_, device='cpu',serialized_model=False):
             file_counter+=1
 
             # Build dataset
-            shower_loader_train, shower_loader_test = build_dataset(filename, config.train_ratio, config.batch_size, device)
+            shower_loader_train, shower_loader_test = build_dataset(filename, config.train_ratio, config.batch_size, device, max_batches=600)
 
             # Accumuate number of batches per epoch
             training_batches_per_epoch += len(shower_loader_train)
