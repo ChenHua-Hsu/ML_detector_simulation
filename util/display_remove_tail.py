@@ -808,7 +808,7 @@ def comparison_summary(dists, dists_gen, sampling_directory, erange=(), xrange=(
 
     #ax[1][1].set_ylabel('entries')
     #ax[1][1].set_xlabel('Hit z position')
-    all_z_gen = all_z_gen[(all_z_gen<=1) & (all_z_gen>=0)]
+    all_z_gen = all_z_gen[(all_z_gen<=15) & (all_z_gen>=0)]
     if len(zrange)==0:
         bins=np.histogram(np.hstack((all_z,all_z_gen)), bins=50)[1]
         ax[1][1].hist(all_z, bins=bins, alpha=0.5, color='orange', label='Geant4')
