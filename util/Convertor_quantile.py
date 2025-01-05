@@ -209,7 +209,7 @@ class Convertor:
 class Convertor_ref:
     def __init__(self, dataset_name, label, padding_value = 0, device='cpu', preprocessor='datasets/test/dataset_2_padded_nentry1129To1269_preprocessor.pkl'):
 
-        self.batches_per_file = [6557,33427,3872,3067,3077]#[1311,6685,774,613,615,2]#[1311,615,613,774,6685,2]
+        self.batches_per_file = [1311,6685,774,613,615]#[6557,33427,3872,3067,3077]#[1311,6685,774,613,615,2]#[1311,615,613,774,6685,2]
         #dataset = torch.load(dataset_name, map_location = torch.device(device))
         #label_tensor = torch.ones(len(dataset[0]), device=device) * label
         #self.dataset = Evaluate.evaluate_dataset(dataset[0], dataset[1], label_tensor, device)
