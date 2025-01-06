@@ -98,8 +98,11 @@ print(f"All files have been combined into {output_file}")
 
 
 Gen_file = os.path.join(output_directory, 'Gen.h5')
-Geant4_file = os.path.join(output_directory, 'Reference.h5')
+#Geant4_file = os.path.join(output_directory, 'Reference.h5')
 plot = display.High_class_feature_plot_test(Gen_file,Geant4_files,output_directory)
 plot_energy_r_plt = plot.plot_energy_r()
 
 plot_energy_r_plt.savefig(os.path.join(output_directory, 'energy_r.png'))
+
+self.reshaped_shower_gen = self.shower_gen.reshape(self.shower_num, self.z_bins, self.theata_bins, self.r_bins)
+self.reshaped_shower_ref = self.shower_ref.reshape(self.shower_num, self.z_bins, self.theata_bins, self.r_bins)
