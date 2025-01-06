@@ -49,7 +49,7 @@ class Preprocessor:
 
 
     def transform_hit_xy(self, hit_pos):
-      transformer = joblib.load("/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/test_dataset/quantile_transformer_x.pkl")
+      transformer = joblib.load("/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/full_quantile_xyz/quantile_transformer_x.pkl")
       #transformer = QuantileTransformer(n_quantiles=1000, output_distribution='normal', subsample=len(hit_pos))
       #transformer.fit(hit_pos)
       new_pos = transformer.transform(hit_pos)
@@ -61,7 +61,7 @@ class Preprocessor:
       return new_pos
 
     def inverse_transform_hit_xy(self, new_pos, mask, new_padding_value):
-      transformer = joblib.load("/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/test_dataset/quantile_transformer_x.pkl")
+      transformer = joblib.load("/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/full_quantile_xyz/quantile_transformer_x.pkl")
       new_pos = new_pos - 4.0
       new_pos = transformer.inverse_transform(new_pos)
       pad  = np.ones((len(new_pos),1)) * new_padding_value
@@ -70,14 +70,14 @@ class Preprocessor:
       return new_pos
 
     def transform_hit_z(self, z_):
-      transformer_z = joblib.load("/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/test_dataset/quantile_transformer_z.pkl")
+      transformer_z = joblib.load("/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/full_quantile_xyz/quantile_transformer_z.pkl")
       new_z = transformer_z.transform(z_)
-      z_ = new_z+4.0
+      z_ = new_z+8.0
       return z_
 
     def inverse_transform_hit_z(self, z_, mask, new_padding_value):
-      transformer_z = joblib.load("/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/test_dataset/quantile_transformer_z.pkl")
-      z_ = z_ - 4.0
+      transformer_z = joblib.load("/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/full_quantile_xyz/quantile_transformer_z.pkl")
+      z_ = z_ - 8.0
       new_z = transformer_z.inverse_transform(z_)
       new_z[mask] = (np.ones((len(z_),1)) * new_padding_value)[mask]
       new_z = np.reshape(new_z, (-1,))
@@ -209,7 +209,7 @@ class Convertor:
 class Convertor_ref:
     def __init__(self, dataset_name, label, padding_value = 0, device='cpu', preprocessor='datasets/test/dataset_2_padded_nentry1129To1269_preprocessor.pkl'):
 
-        self.batches_per_file = [6557,33427,3872,3067,3077]#[1311,6685,774,613,615,2]#[1311,615,613,774,6685,2]
+        self.batches_per_file = [1311,6685,774,613,615]#[6557,33427,3872,3067,3077]#[1311,6685,774,613,615,2]#[1311,615,613,774,6685,2]
         #dataset = torch.load(dataset_name, map_location = torch.device(device))
         #label_tensor = torch.ones(len(dataset[0]), device=device) * label
         #self.dataset = Evaluate.evaluate_dataset(dataset[0], dataset[1], label_tensor, device)
