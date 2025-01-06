@@ -904,8 +904,8 @@ class High_class_feature_plot:
         energy_per_r_layer = []
         energy_per_r_layer_ref = [] 
         for i in range(self.r_bins):
-            energy_per_r_layer.append(self.reshaped_shower_gen[:,:,:,i].sum() / self.shower_num)
-            energy_per_r_layer_ref.append(self.reshaped_shower_ref[:,:,:,i].sum() / self.shower_num)
+            energy_per_r_layer.append(self.reshaped_shower_gen[:,8,:,i].sum() / self.shower_num)
+            energy_per_r_layer_ref.append(self.reshaped_shower_ref[:,8,:,i].sum() / self.shower_num)
 
         energy_per_r_layer = np.array(energy_per_r_layer)
         energy_per_r_layer_ref = np.array(energy_per_r_layer_ref)
@@ -1050,7 +1050,7 @@ class High_class_feature_plot_test:
         self.shower_nums = []
 
         i = 0 
-        self.batches = [6557,33427,3872,3067,3077]#[1311,6685,774,613,615]#[1311,615,613,774,6685,2]#[774,613,2,6685,615,1311]
+        self.batches = [1311,6685,774,613,615]#[6557,33427,3872,3067,3077]##[1311,615,613,774,6685,2]#[774,613,2,6685,615,1311]
         # Load and concatenate all reference files, and keep track of shower counts
         for ref_file in reference_files:
             print(ref_file)
@@ -1093,8 +1093,8 @@ class High_class_feature_plot_test:
         energy_per_r_layer_gen = []
         energy_per_r_layer_ref = [] 
         for i in range(self.r_bins):
-            energy_per_r_layer_gen.append(self.reshaped_shower_gen[:, :, :, i].sum() / self.shower_num)
-            energy_per_r_layer_ref.append(self.reshaped_shower_ref[:, :, :, i].sum() / self.shower_num)
+            energy_per_r_layer_gen.append(self.reshaped_shower_gen[:, 8, :, i].sum() / self.shower_num)
+            energy_per_r_layer_ref.append(self.reshaped_shower_ref[:, 8, :, i].sum() / self.shower_num)
             print("type: ",type(self.reshaped_shower_ref))
         energy_per_r_layer_gen = np.array(energy_per_r_layer_gen)
         energy_per_r_layer_ref = np.array(energy_per_r_layer_ref)
