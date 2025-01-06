@@ -165,8 +165,8 @@ class Gen(nn.Module):
         """
         
         # Embed 4-vector input 
-        e = e.unsqueeze(1).unsqueeze(2).expand(-1, x.size(1), -1)
-        x = torch.cat([x, e], dim=-1)
+        e_1 = e.unsqueeze(1).unsqueeze(2).expand(-1, x.size(1), -1)
+        x = torch.cat([x, e_1], dim=-1)
         x = self.embed(x)
         # Embed 'time' condition
         embed_t_ = self.act_sig( self.embed_t(t) )
