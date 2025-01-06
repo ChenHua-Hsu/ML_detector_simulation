@@ -49,7 +49,7 @@ class Preprocessor:
 
 
     def transform_hit_xy(self, hit_pos):
-      transformer = joblib.load("/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/test_dataset/quantile_transformer_x.pkl")
+      transformer = joblib.load("/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/full_quantile_xyz/quantile_transformer_x.pkl")
       #transformer = QuantileTransformer(n_quantiles=1000, output_distribution='normal', subsample=len(hit_pos))
       #transformer.fit(hit_pos)
       new_pos = transformer.transform(hit_pos)
@@ -61,7 +61,7 @@ class Preprocessor:
       return new_pos
 
     def inverse_transform_hit_xy(self, new_pos, mask, new_padding_value):
-      transformer = joblib.load("/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/test_dataset/quantile_transformer_x.pkl")
+      transformer = joblib.load("/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/full_quantile_xyz/quantile_transformer_x.pkl")
       new_pos = new_pos - 4.0
       new_pos = transformer.inverse_transform(new_pos)
       pad  = np.ones((len(new_pos),1)) * new_padding_value
@@ -70,13 +70,13 @@ class Preprocessor:
       return new_pos
 
     def transform_hit_z(self, z_):
-      transformer_z = joblib.load("/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/test_dataset/quantile_transformer_z.pkl")
+      transformer_z = joblib.load("/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/full_quantile_xyz/quantile_transformer_z.pkl")
       new_z = transformer_z.transform(z_)
       z_ = new_z+4.0
       return z_
 
     def inverse_transform_hit_z(self, z_, mask, new_padding_value):
-      transformer_z = joblib.load("/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/test_dataset/quantile_transformer_z.pkl")
+      transformer_z = joblib.load("/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/full_quantile_xyz/quantile_transformer_z.pkl")
       z_ = z_ - 4.0
       new_z = transformer_z.inverse_transform(z_)
       new_z[mask] = (np.ones((len(z_),1)) * new_padding_value)[mask]
