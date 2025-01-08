@@ -731,142 +731,142 @@ def main(config=None):
             workingdir = os.getcwd()
             #out = './'
             if not switches_>>2 & trigger:
-              output_directory = os.path.join(workingdir,'/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/sampling_result/sampling_quantile_fulldataset20241226_0017_output')
+              output_directory = os.path.join(workingdir,'sampling_result/sampling_quantile_fulldataset20250106_1240_output')
             #output_directory = os.path.join(workingdir,'sampling_20240708_2258_output')
             print(f'Evaluation outputs stored here: {output_directory}')
             plot_file_name = os.path.join(output_directory, 'sample.pt')
-            # custom_data = utils.cloud_dataset(plot_file_name,device=device)
-            # # when providing just cloud dataset, energy_trans_file needs to include full path
-            # dists_gen = display.plot_distribution(custom_data, nshowers_2_plot=config.n_showers_2_gen, padding_value=padding_value)
+            custom_data = utils.cloud_dataset(plot_file_name,device=device)
+            # when providing just cloud dataset, energy_trans_file needs to include full path
+            dists_gen = display.plot_distribution(custom_data, nshowers_2_plot=config.n_showers_2_gen, padding_value=padding_value)
 
-            # entries_gen = dists_gen[0]
-            # all_incident_e_gen = dists_gen[1]
-            # total_deposited_e_shower_gen = dists_gen[2]
-            # all_e_gen = dists_gen[3]
-            # all_x_gen = dists_gen[4]
-            # all_y_gen = dists_gen[5]
-            # all_z_gen = dists_gen[6]
-            # all_hit_ine_gen = dists_gen[7]
-            # average_x_shower_gen = dists_gen[8]
-            # average_y_shower_gen = dists_gen[9]
+            entries_gen = dists_gen[0]
+            all_incident_e_gen = dists_gen[1]
+            total_deposited_e_shower_gen = dists_gen[2]
+            all_e_gen = dists_gen[3]
+            all_x_gen = dists_gen[4]
+            all_y_gen = dists_gen[5]
+            all_z_gen = dists_gen[6]
+            all_hit_ine_gen = dists_gen[7]
+            average_x_shower_gen = dists_gen[8]
+            average_y_shower_gen = dists_gen[9]
 
-            # print(f'Geant4 inputs')
-            # # Distributions object for Geant4 files
-            # dists = display.plot_distribution(files_list_, nshowers_2_plot=config.n_showers_2_gen, padding_value=padding_value)
+            print(f'Geant4 inputs')
+            # Distributions object for Geant4 files
+            dists = display.plot_distribution(files_list_, nshowers_2_plot=config.n_showers_2_gen, padding_value=padding_value)
 
-            # entries = dists[0]
-            # all_incident_e = dists[1]
-            # total_deposited_e_shower = dists[2]
-            # all_e = dists[3]
-            # all_x = dists[4]
-            # all_y = dists[5]
-            # all_z = dists[6]
-            # all_hit_ine_geant = dists[7]
-            # average_x_shower_geant = dists[8]
-            # average_y_shower_geant = dists[9]
+            entries = dists[0]
+            all_incident_e = dists[1]
+            total_deposited_e_shower = dists[2]
+            all_e = dists[3]
+            all_x = dists[4]
+            all_y = dists[5]
+            all_z = dists[6]
+            all_hit_ine_geant = dists[7]
+            average_x_shower_geant = dists[8]
+            average_y_shower_geant = dists[9]
 
             
 
 
 
-            # print('Plot entries')
-            # bins=np.histogram(np.hstack((entries,entries_gen)), bins=50)[1]
-            # fig, ax = plt.subplots(3,3, figsize=(12,6))
-            # #fig1, ax = plt.subplots(1,2, figsize=(12,6))
-            # # print('Plot hit energy vs. r')
-            # # ax[0].set_ylabel('Hit energy [GeV]')
-            # # ax[0].set_xlabel('r [cm]')
-            # # ax[0].plot(all_r, all_e, label='Geant4',color='gray')
-            # # ax[0].plot(all_r_gen, all_e_gen, label='Gen',color='orange')
-            # # ax[0].legend(loc='upper right')
-            # # ax[1].set_ylabel('Hit energy [GeV]')
-            # # ax[1].set_xlabel('layer')
-            # # ax[1].plot(all_z, all_e,label='Geant4',color='gray')
-            # # ax[1].plot(all_z_gen, all_e,label='Gen',color='orange')
-            # # ax[1].legend(loc='upper right')
-            # # fig1_name = '/home/ken91021615/tdsm_encoder_sweep0516/hit_energy_vs_r1.png'
-            # # fig1.savefig(fig1_name)
+            print('Plot entries')
+            bins=np.histogram(np.hstack((entries,entries_gen)), bins=50)[1]
+            fig, ax = plt.subplots(3,3, figsize=(12,6))
+            #fig1, ax = plt.subplots(1,2, figsize=(12,6))
+            # print('Plot hit energy vs. r')
+            # ax[0].set_ylabel('Hit energy [GeV]')
+            # ax[0].set_xlabel('r [cm]')
+            # ax[0].plot(all_r, all_e, label='Geant4',color='gray')
+            # ax[0].plot(all_r_gen, all_e_gen, label='Gen',color='orange')
+            # ax[0].legend(loc='upper right')
+            # ax[1].set_ylabel('Hit energy [GeV]')
+            # ax[1].set_xlabel('layer')
+            # ax[1].plot(all_z, all_e,label='Geant4',color='gray')
+            # ax[1].plot(all_z_gen, all_e,label='Gen',color='orange')
+            # ax[1].legend(loc='upper right')
+            # fig1_name = '/home/ken91021615/tdsm_encoder_sweep0516/hit_energy_vs_r1.png'
+            # fig1.savefig(fig1_name)
 
-            # #ax[0][0].set_ylabel(r'$\#$ entries')
-            # #ax[0][0].set_xlabel('Hit entries')
-            # ax[0][0].hist(entries, bins, alpha=0.5, color='orange', label='Geant4')
-            # ax[0][0].hist(entries_gen, bins, alpha=0.5, color='blue', label='Gen')
-            # ax[0][0].legend(loc='upper right')
+            #ax[0][0].set_ylabel(r'$\#$ entries')
+            #ax[0][0].set_xlabel('Hit entries')
+            ax[0][0].hist(entries, bins, alpha=0.5, color='orange', label='Geant4')
+            ax[0][0].hist(entries_gen, bins, alpha=0.5, color='blue', label='Gen')
+            ax[0][0].legend(loc='upper right')
 
-            # print('Plot hit energies')
-            # bins=np.histogram(np.hstack((all_e,all_e_gen)), bins=50)[1]
-            # #ax[0][1].set_ylabel(r'$\#$ entries')
-            # #ax[0][1].set_xlabel('Hit energy [GeV]')
-            # ax[0][1].hist(all_e, bins, alpha=0.5, color='orange', label='Geant4')
-            # ax[0][1].hist(all_e_gen, bins, alpha=0.5, color='blue', label='Gen')
-            # #ax[0][1].set_yscale('log')
-            # ax[0][1].legend(loc='upper right')
+            print('Plot hit energies')
+            bins=np.histogram(np.hstack((all_e,all_e_gen)), bins=50)[1]
+            #ax[0][1].set_ylabel(r'$\#$ entries')
+            #ax[0][1].set_xlabel('Hit energy [GeV]')
+            ax[0][1].hist(all_e, bins, alpha=0.5, color='orange', label='Geant4')
+            ax[0][1].hist(all_e_gen, bins, alpha=0.5, color='blue', label='Gen')
+            #ax[0][1].set_yscale('log')
+            ax[0][1].legend(loc='upper right')
 
-            # print('Plot hit x')
-            # bins=np.histogram(np.hstack((all_x,all_x_gen)), bins=50)[1]
-            # #ax[0][2].set_ylabel(r'$\#$ entries')
-            # #ax[0][2].set_xlabel('Hit x position')
-            # ax[0][2].hist(all_x, bins, alpha=0.5, color='orange', label='Geant4')
-            # ax[0][2].hist(all_x_gen, bins, alpha=0.5, color='blue', label='Gen')
-            # #ax[0][2].set_yscale('log')
-            # ax[0][2].legend(loc='upper right')
+            print('Plot hit x')
+            bins=np.histogram(np.hstack((all_x,all_x_gen)), bins=50)[1]
+            #ax[0][2].set_ylabel(r'$\#$ entries')
+            #ax[0][2].set_xlabel('Hit x position')
+            ax[0][2].hist(all_x, bins, alpha=0.5, color='orange', label='Geant4')
+            ax[0][2].hist(all_x_gen, bins, alpha=0.5, color='blue', label='Gen')
+            #ax[0][2].set_yscale('log')
+            ax[0][2].legend(loc='upper right')
 
-            # print('Plot hit y')
-            # bins=np.histogram(np.hstack((all_y,all_y_gen)), bins=50)[1]
-            # #ax[1][0].set_ylabel(r'$\#$ entries')
-            # #ax[1][0].set_xlabel('Hit y position')
-            # ax[1][0].hist(all_y, bins, alpha=0.5, color='orange', label='Geant4')
-            # ax[1][0].hist(all_y_gen, bins, alpha=0.5, color='blue', label='Gen')
-            # #ax[1][0].set_yscale('log')
-            # ax[1][0].legend(loc='upper right')
+            print('Plot hit y')
+            bins=np.histogram(np.hstack((all_y,all_y_gen)), bins=50)[1]
+            #ax[1][0].set_ylabel(r'$\#$ entries')
+            #ax[1][0].set_xlabel('Hit y position')
+            ax[1][0].hist(all_y, bins, alpha=0.5, color='orange', label='Geant4')
+            ax[1][0].hist(all_y_gen, bins, alpha=0.5, color='blue', label='Gen')
+            #ax[1][0].set_yscale('log')
+            ax[1][0].legend(loc='upper right')
 
-            # print('Plot hit z')
-            # bins=np.histogram(np.hstack((all_z,all_z_gen)), bins=50)[1]
-            # #ax[1][1].set_ylabel(r'$\#$ entries')
-            # #ax[1][1].set_xlabel('Hit z position')
-            # ax[1][1].hist(all_z, bins, alpha=0.5, color='orange', label='Geant4')
-            # ax[1][1].hist(all_z_gen, bins, alpha=0.5, color='blue', label='Gen')
-            # #ax[1][1].set_yscale('log')
-            # ax[1][1].legend(loc='upper right')
+            print('Plot hit z')
+            bins=np.histogram(np.hstack((all_z,all_z_gen)), bins=50)[1]
+            #ax[1][1].set_ylabel(r'$\#$ entries')
+            #ax[1][1].set_xlabel('Hit z position')
+            ax[1][1].hist(all_z, bins, alpha=0.5, color='orange', label='Geant4')
+            ax[1][1].hist(all_z_gen, bins, alpha=0.5, color='blue', label='Gen')
+            #ax[1][1].set_yscale('log')
+            ax[1][1].legend(loc='upper right')
 
-            # print('Plot incident energies')
-            # bins=np.histogram(np.hstack((all_incident_e,all_incident_e_gen)), bins=50)[1]
-            # #ax[1][2].set_ylabel(r'$\#$ entries')
-            # #ax[1][2].set_xlabel('Incident energies [GeV]')
-            # ax[1][2].hist(all_incident_e, bins, alpha=0.5, color='orange', label='Geant4')
-            # ax[1][2].hist(all_incident_e_gen, bins, alpha=0.5, color='blue', label='Gen')
-            # #ax[1][2].set_yscale('log')
-            # ax[1][2].legend(loc='upper right')
+            print('Plot incident energies')
+            bins=np.histogram(np.hstack((all_incident_e,all_incident_e_gen)), bins=50)[1]
+            #ax[1][2].set_ylabel(r'$\#$ entries')
+            #ax[1][2].set_xlabel('Incident energies [GeV]')
+            ax[1][2].hist(all_incident_e, bins, alpha=0.5, color='orange', label='Geant4')
+            ax[1][2].hist(all_incident_e_gen, bins, alpha=0.5, color='blue', label='Gen')
+            #ax[1][2].set_yscale('log')
+            ax[1][2].legend(loc='upper right')
 
-            # print('Plot total deposited hit energy')
-            # bins=np.histogram(np.hstack((total_deposited_e_shower,total_deposited_e_shower_gen)), bins=50)[1]
-            # #ax[2][0].set_ylabel(r'$\#$ entries')
-            # #ax[2][0].set_xlabel('Deposited energy [GeV]')
-            # ax[2][0].hist(total_deposited_e_shower, bins, alpha=0.5, color='orange', label='Geant4')
-            # ax[2][0].hist(total_deposited_e_shower_gen, bins, alpha=0.5, color='blue', label='Gen')
-            # #ax[2][0].set_yscale('log')
-            # ax[2][0].legend(loc='upper right')
+            print('Plot total deposited hit energy')
+            bins=np.histogram(np.hstack((total_deposited_e_shower,total_deposited_e_shower_gen)), bins=50)[1]
+            #ax[2][0].set_ylabel(r'$\#$ entries')
+            #ax[2][0].set_xlabel('Deposited energy [GeV]')
+            ax[2][0].hist(total_deposited_e_shower, bins, alpha=0.5, color='orange', label='Geant4')
+            ax[2][0].hist(total_deposited_e_shower_gen, bins, alpha=0.5, color='blue', label='Gen')
+            #ax[2][0].set_yscale('log')
+            ax[2][0].legend(loc='upper right')
 
-            # print('Plot average hit X position')
-            # bins=np.histogram(np.hstack((average_x_shower_geant,average_x_shower_gen)), bins=50)[1]
-            # #ax[2][1].set_ylabel(r'$\#$ entries')
-            # #ax[2][1].set_xlabel('Average X pos.')
-            # ax[2][1].hist(average_x_shower_geant, bins, alpha=0.5, color='orange', label='Geant4')
-            # ax[2][1].hist(average_x_shower_gen, bins, alpha=0.5, color='blue', label='Gen')
-            # #ax[2][1].set_yscale('log')
-            # ax[2][1].legend(loc='upper right')
+            print('Plot average hit X position')
+            bins=np.histogram(np.hstack((average_x_shower_geant,average_x_shower_gen)), bins=50)[1]
+            #ax[2][1].set_ylabel(r'$\#$ entries')
+            #ax[2][1].set_xlabel('Average X pos.')
+            ax[2][1].hist(average_x_shower_geant, bins, alpha=0.5, color='orange', label='Geant4')
+            ax[2][1].hist(average_x_shower_gen, bins, alpha=0.5, color='blue', label='Gen')
+            #ax[2][1].set_yscale('log')
+            ax[2][1].legend(loc='upper right')
 
-            # print('Plot average hit Y position')
-            # bins=np.histogram(np.hstack((average_y_shower_geant,average_y_shower_gen)), bins=50)[1]
-            # #ax[2][2].set_ylabel(r'$\#$ entries')
-            # #ax[2][2].set_xlabel('Average Y pos.')
-            # ax[2][2].hist(average_y_shower_geant, bins, alpha=0.5, color='orange', label='Geant4')
-            # ax[2][2].hist(average_y_shower_gen, bins, alpha=0.5, color='blue', label='Gen')
-            # #ax[2][2].set_yscale('log')
-            # ax[2][2].legend(loc='upper right')
+            print('Plot average hit Y position')
+            bins=np.histogram(np.hstack((average_y_shower_geant,average_y_shower_gen)), bins=50)[1]
+            #ax[2][2].set_ylabel(r'$\#$ entries')
+            #ax[2][2].set_xlabel('Average Y pos.')
+            ax[2][2].hist(average_y_shower_geant, bins, alpha=0.5, color='orange', label='Geant4')
+            ax[2][2].hist(average_y_shower_gen, bins, alpha=0.5, color='blue', label='Gen')
+            #ax[2][2].set_yscale('log')
+            ax[2][2].legend(loc='upper right')
 
-            # save_name = os.path.join(output_directory,'input_dists.png')
-            # fig.savefig(save_name)
+            save_name = os.path.join(output_directory,'input_dists.png')
+            fig.savefig(save_name)
 
             
 #             # Convert Generated file
@@ -937,7 +937,7 @@ def main(config=None):
             wandb.log({"summary" : wandb.Image(plot_energy_z_plt)})
             wandb.log({"summary" : wandb.Image(r_width_plt)})
             wandb.log({"summary" : wandb.Image(max_voxel_dep_energy_layer_plt)}) 
-            os.system('python3 util/evaluate_image_based.py -m all --output_dir {outdir} --input_file {Gen_file} --reference_file {Geant4_file} --dataset 2'.format(Gen_file = os.path.join(output_directory, 'Gen.h5'), Geant4_file = os.path.join(output_directory, 'combined_Geant4.h5'), outdir = os.path.join(output_directory, 'calo_score')))
+            os.system('python3 util/evaluate_image_based.py -m all --output_dir {outdir} --input_file {Gen_file} --reference_file {Geant4_file} --dataset 2'.format(Gen_file = os.path.join(output_directory, 'Gen.h5'), Geant4_file = os.path.join(output_directory, 'Reference_0.h5'), outdir = os.path.join(output_directory, 'calo_score')))
             wandb.log({"summary" : wandb.Image(os.path.join(output_directory, 'calo_score', 'reference_average_shower_dataset_2.png'))})
             wandb.log({"summary" : wandb.Image(os.path.join(output_directory, 'calo_score', 'average_shower_dataset_2.png'))})
             wandb.log({"summary":  wandb.Image(os.path.join(output_directory, 'calo_score', 'voxel_energy_dataset_2.png'))})

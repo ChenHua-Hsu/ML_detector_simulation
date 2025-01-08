@@ -1093,8 +1093,8 @@ class High_class_feature_plot_test:
         energy_per_r_layer_gen = []
         energy_per_r_layer_ref = [] 
         for i in range(self.r_bins):
-            energy_per_r_layer_gen.append(self.reshaped_shower_gen[:, 8, :, i].sum() / self.shower_num)
-            energy_per_r_layer_ref.append(self.reshaped_shower_ref[:, 8, :, i].sum() / self.shower_num)
+            energy_per_r_layer_gen.append(self.reshaped_shower_gen[:, 8, :, i].sum() / self.shower_num*1000.)
+            energy_per_r_layer_ref.append(self.reshaped_shower_ref[:, 8, :, i].sum() / self.shower_num*1000.)
             print("type: ",type(self.reshaped_shower_ref))
         energy_per_r_layer_gen = np.array(energy_per_r_layer_gen)
         energy_per_r_layer_ref = np.array(energy_per_r_layer_ref)
@@ -1116,7 +1116,8 @@ class High_class_feature_plot_test:
         ax1.plot(energy_per_r_layer_gen, label='Gen', color='blue', marker='o')
         ax1.plot(energy_per_r_layer_ref, label='Reference', color='red', marker='x')
         ax1.set_xlabel('r-bin')
-        ax1.set_ylabel('energy')
+        ax1.set_ylabel('energy*1000.')
+        ax1.set_yscale('log')
         ax1.set_title('energy vs r-bin')
         ax1.legend()
 
