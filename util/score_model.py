@@ -432,6 +432,8 @@ class ScoreMatchingLoss(nn.Module):
         # Noise
         z = torch.normal(0,1,size=x.shape, device=device)
         if not diffusion_on_mask:
+          #print("z_shape: ",z.shape)
+          #print("mask_tensor_shape: ",mask_tensor.shape)
           z = z*mask_tensor
 
         # Add noise, scheduled by perturbation kernel, to input

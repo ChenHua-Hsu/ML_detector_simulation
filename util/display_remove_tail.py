@@ -855,6 +855,91 @@ def comparison_summary(dists, dists_gen, sampling_directory, erange=(), xrange=(
     #plt.savefig( os.path.join(sampling_directory,'comparison.png') )
 
     return fig
+
+def scatter_plot_z_xyr(dists,dists_gen, sampling_directory):
+    
+    entries = dists[0]
+    all_incident_e = dists[1]
+    all_hit_ine_geant = dists[2]
+    all_e = dists[3]
+    all_x = dists[4]
+    all_y = dists[5]
+    all_z = dists[6]
+    all_e = np.array(all_e)
+    all_x = np.array(all_x)
+    all_y = np.array(all_y)
+    all_z = np.array(all_z)
+    average_e_shower_geant = dists[7]
+    average_x_shower_geant = dists[8]
+    average_y_shower_geant = dists[9]
+    
+    entries_gen = dists_gen[0]
+    all_incident_e_gen = dists_gen[1]
+    all_hit_ine_gen = dists_gen[2]
+    all_e_gen = dists_gen[3]
+    all_x_gen = dists_gen[4]
+    all_y_gen = dists_gen[5]
+    all_z_gen = dists_gen[6]
+    average_e_shower_gen = dists_gen[7]
+    average_x_shower_gen = dists_gen[8]
+    average_y_shower_gen = dists_gen[9]
+    all_e_gen = np.array(all_e_gen)
+    all_x_gen = np.array(all_x_gen)
+    all_y_gen = np.array(all_y_gen)
+    all_z_gen = np.array(all_z_gen)
+    """
+    Generate scatter plots for z vs x, z vs y, and z vs r, comparing Geant4 and Gen data.
+
+    Parameters:
+        all_z (array): z positions for Geant4 data.
+        all_x (array): x positions for Geant4 data.
+        all_y (array): y positions for Geant4 data.
+        all_z_gen (array): z positions for Gen data.
+        all_x_gen (array): x positions for Gen data.
+        all_y_gen (array): y positions for Gen data.
+        output_directory (str): Directory to save the scatter plot.
+
+    Returns:
+        matplotlib.figure.Figure: The generated scatter plot figure.
+    """
+    # Calculate r for Geant4 and Gen data
+    all_r = np.sqrt(np.array(all_x)**2 + np.array(all_y)**2)
+    all_r_gen = np.sqrt(np.array(all_x_gen)**2 + np.array(all_y_gen)**2)
+
+    fig, ax = plt.subplots(1, 3, figsize=(18, 6), sharey=True)
+
+    # Scatter plot for z vs x
+    ax[0].scatter(all_z, all_x, s=1, alpha=0.5, color='orange', label='Geant4')
+    ax[0].scatter(all_z_gen, all_x_gen, s=1, alpha=0.5, color='blue', label='Gen')
+    ax[0].set_xlabel('z position')
+    ax[0].set_ylabel('x position')
+    ax[0].set_title('Scatter Plot: z vs x')
+    ax[0].legend()
+
+    # Scatter plot for z vs y
+    ax[1].scatter(all_z, all_y, s=1, alpha=0.5, color='orange', label='Geant4')
+    ax[1].scatter(all_z_gen, all_y_gen, s=1, alpha=0.5, color='blue', label='Gen')
+    ax[1].set_xlabel('z position')
+    ax[1].set_ylabel('y position')
+    ax[1].set_title('Scatter Plot: z vs y')
+    ax[1].legend()
+
+    # Scatter plot for z vs r
+    ax[2].scatter(all_z, all_r, s=1, alpha=0.5, color='orange', label='Geant4')
+    ax[2].scatter(all_z_gen, all_r_gen, s=1, alpha=0.5, color='blue', label='Gen')
+    ax[2].set_xlabel('z position')
+    ax[2].set_ylabel('r position')
+    ax[2].set_title('Scatter Plot: z vs r')
+    ax[2].legend()
+
+    plt.tight_layout()
+
+    # Save the scatter plot
+    output_path = os.path.join(sampling_directory, 'scatter_plot_z_xyr.png')
+    plt.savefig(output_path)
+    print(f'Scatter plot saved to: {output_path}')
+
+    return fig
 def correlation(variable1,varaible2):
     e = variable1  # energy
     theta = varaible2  # theta (phi in cylindrical coordinates)

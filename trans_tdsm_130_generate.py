@@ -70,6 +70,122 @@ def check_mem():
     # Print bytes in GB
     print('Memory usage of current process 0 [GB]: ', process.memory_info().rss/(1024 * 1024 * 1024))
     return
+import torch
+from torch.utils.data import Dataset, ConcatDataset, DataLoader
+import utils  # Assuming this contains your `cloud_dataset` definition
+
+def build_combined_dataset(files_list, batch_size, device):
+    """
+    Combine multiple datasets into one and create a DataLoader.
+
+    Args:
+        files_list (list): List of file paths for the datasets.
+        batch_size (int): Batch size for the DataLoader.
+        device (torch.device): Device where the data will be loaded.
+
+    Returns:
+        DataLoader: Combined DataLoader with data from all files, shuffled.
+    """
+    # Create individual datasets for each file
+    datasets = [ShowerDataset(filename, device=device) for filename in files_list]
+
+    # Combine all datasets into one
+    combined_dataset = ConcatDataset(datasets)
+
+    # Create a DataLoader with shuffling across the combined dataset\
+    #print("combined_dataset", combined_dataset[0].shape)
+    pre_batched_dataset = PreBatchedShowerDataset(combined_dataset, batch_size)
+    #print("pre_batched_dataset", pre_batched_dataset[0].shape)
+    # Use DataLoader to shuffle pre-batched data
+    shower_loader_train = DataLoader(pre_batched_dataset, batch_size=None, shuffle=True)
+
+
+    #shower_loader_train = DataLoader(combined_dataset, batch_size=batch_size, shuffle=True)
+
+    return shower_loader_train
+
+class ShowerDataset(Dataset):
+    def __init__(self, filename, device, transform=None, target_transform=None):
+        """
+        Custom dataset to load showers lazily from a file.
+
+        Args:
+            filename (str): Path to the data file.
+            device (torch.device): Device for loading data (e.g., CPU or GPU).
+            transform (callable, optional): Transformations to apply to the showers.
+            target_transform (callable, optional): Transformations to apply to the labels.
+        """
+        self.data = utils.cloud_dataset(filename, device=device)
+        self.transform = transform
+        self.target_transform = target_transform
+        #print("shape in showerdataset", self.data[0].shape)
+        #print("shape in showerdataset", self.data[1].shape)
+        #print(dir(self.data))  # List all attributes and methods in the `cloud_dataset`
+
+    def __len__(self):
+        return len(self.data.data)
+
+    def __getitem__(self, idx):
+        """
+        Fetch a single shower and its label.
+
+        Args:
+            idx (int): Index of the sample to fetch.
+
+        Returns:
+            tuple: (shower_data, incident_energy)
+        """
+        shower_data = self.data.data[idx]  # Assuming this accesses the shower data
+        incident_energy = self.data.condition[idx]  # Assuming this accesses the labels
+
+        # if self.transform:
+        #     shower_data = self.transform(shower_data)
+        # if self.target_transform:
+        #     incident_energy = self.target_transform(incident_energy)
+        print("shape in getitem", shower_data.shape)
+        print("shape in getitem", incident_energy.shape)
+        return shower_data, incident_energy
+
+
+# Build the combined DataLoader
+class PreBatchedShowerDataset(Dataset):
+    def __init__(self, dataset, batch_size):
+        """
+        Wrap a dataset to return pre-batched samples.
+
+        Args:
+            dataset (Dataset): The original dataset.
+            batch_size (int): Size of each batch.
+        """
+        self.dataset = dataset
+        self.batch_size = batch_size
+        self.num_batches = len(self.dataset) // batch_size
+
+    def __len__(self):
+        return self.num_batches
+
+    def __getitem__(self, idx):
+        """
+        Return a pre-batched set of data.
+        """
+        start_idx = idx * self.batch_size
+        end_idx = start_idx + self.batch_size
+        batch = [self.dataset[i] for i in range(start_idx, end_idx)]
+        # Separate showers and incident energies into two lists
+        batch_shower_data, batch_incident_energies = zip(*batch)
+        #batch_data, batch_labels = zip(*batch)  # Separate showers and incident energies
+        #batch_shower_data = torch.stack(batch_shower_data)  # Shape: [batch_size, ...]
+        print(f"PreBatchedShowerDataset: Individual sample shape = {batch_shower_data[0].shape}")
+        print(f"PreBatchedShowerDataset: Before stack, batch_shower_data = {[d.shape for d in batch_shower_data]}")
+        batch_shower_data = torch.stack(batch_shower_data)
+        print(f"PreBatchedShowerDataset: After stack, batch_shower_data.shape = {batch_shower_data.shape}")
+        batch_incident_energies = torch.tensor(batch_incident_energies)  # Shape: [batch_size]
+        print(f"PreBatchedShowerDataset: Final batch_shower_data.shape = {batch_shower_data.shape}")
+        print(f"PreBatchedShowerDataset: Final batch_incident_energies.shape = {batch_incident_energies.shape}")
+
+        return batch_shower_data, batch_incident_energies
+
+
 
 def train_model(files_list_, device='cpu',serialized_model=False):
 
@@ -141,48 +257,56 @@ def train_model(files_list_, device='cpu',serialized_model=False):
         testing_batches_per_epoch = 0
 
         # Load files
-        for filename in files_list_:
-            file_counter+=1
+        # for filename in files_list_:
+        #     file_counter+=1
 
             # Build dataset
-            shower_loader_train, shower_loader_test = build_dataset(filename, config.train_ratio, config.batch_size, device)
+        #pre_batched_dataset = PreBatchedShowerDataset(combined_dataset, config.batch_size)
 
-            # Accumuate number of batches per epoch
-            training_batches_per_epoch += len(shower_loader_train)
-            testing_batches_per_epoch += len(shower_loader_test)
-            
-            # Load shower batch for training
-            for i, (shower_data,incident_energies) in enumerate(shower_loader_train,0):
-                batch_ct+=1
-                # Move model to device and set dtype as same as data (note torch.double works on both CPU and GPU)
-                model.to(device, shower_data.dtype)
-                model.train()
-                shower_data.to(device)
-                incident_energies.to(device)
-                if len(shower_data) < 1:
-                    continue
+        # Use DataLoader to shuffle pre-batched data
+        #shower_loader_train = DataLoader(pre_batched_dataset, shuffle=True)
+        shower_loader_train = build_combined_dataset(files_list_, config.batch_size, device)
+        #shower_loader_train, shower_loader_test = build_dataset(filename, config.train_ratio, config.batch_size, device)
 
-                # Zero any gradients from previous steps
-                optimiser.zero_grad()
-                # Loss average for each batch
-                loss = loss_fn(model, shower_data, incident_energies, marginal_prob_std_fn, padding_value=0.0, device=device, diffusion_on_mask=False,serialized_model=False, cp_chunks=4)
-                # collect dL/dx for any parameters (x) which have requires_grad = True via: x.grad += dL/dx
-                loss.backward()
-                cumulative_epoch_loss+=loss.item()
-                # Update value of x += -lr * x.grad
-                optimiser.step()
-                # Report metrics every 5th batch
-                if ((batch_ct + 1) % 5) == 0:
-                    train_log(loss, batch_ct, epoch)
+        # Accumuate number of batches per epoch
+        #training_batches_per_epoch += len(shower_loader_train)
+        #testing_batches_per_epoch += len(shower_loader_test)
+        
+        # Load shower batch for training
+        for i, (shower_data,incident_energies) in enumerate(shower_loader_train,0):
+            batch_ct+=1
+            # Move model to device and set dtype as same as data (note torch.double works on both CPU and GPU)
+            print(len(shower_data))
+            print(shower_data.shape)
+            print(incident_energies.shape)
+            model.to(device, shower_data.dtype)
+            model.train()
+            shower_data.to(device)
+            incident_energies.to(device)
+            if len(shower_data) < 1:
+                continue
+
+            # Zero any gradients from previous steps
+            optimiser.zero_grad()
+            # Loss average for each batch
+            loss = loss_fn(model, shower_data, incident_energies, marginal_prob_std_fn, padding_value=0.0, device=device, diffusion_on_mask=False,serialized_model=False, cp_chunks=4)
+            # collect dL/dx for any parameters (x) which have requires_grad = True via: x.grad += dL/dx
+            loss.backward()
+            cumulative_epoch_loss+=loss.item()
+            # Update value of x += -lr * x.grad
+            optimiser.step()
+            # Report metrics every 5th batch
+            if ((batch_ct + 1) % 5) == 0:
+                train_log(loss, batch_ct, epoch)
             
             # Testing on subset of file
-            for i, (shower_data,incident_energies) in enumerate(shower_loader_test,0):
-                with torch.no_grad():
-                    model.to(device, shower_data.dtype)
-                    model.eval()
-                    shower_data = shower_data.to(device)
-                    incident_energies = incident_energies.to(device)
-                    test_loss = score_model.loss_fn(model, shower_data, incident_energies, marginal_prob_std_fn, padding_value=0.0, device=device,serialized_model=False, cp_chunks=4)
+            # for i, (shower_data,incident_energies) in enumerate(shower_loader_test,0):
+            #     with torch.no_grad():
+            #         model.to(device, shower_data.dtype)
+            #         model.eval()
+            #         shower_data = shower_data.to(device)
+            #         incident_energies = incident_energies.to(device)
+            #         test_loss = score_model.loss_fn(model, shower_data, incident_energies, marginal_prob_std_fn, padding_value=0.0, device=device,serialized_model=False, cp_chunks=4)
 
         scheduler.step()
         
@@ -433,6 +557,7 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
     # Distributions object for Geant4 files
     dists = display.plot_distribution(files_list_, nshowers_2_plot=config.n_showers_2_gen, padding_value=0.0)
     comparison_fig = display.comparison_summary(dists, dists_gen, output_directory)#, erange=(-5,3), xrange=(-2.5,2.5), yrange=(-2.5,2.5), zrange=(0,1))
+    scatter_fig = display.scatter_summary(dists, dists_gen, output_directory)
     # Add evaluation plots to keep on wandb
     #et_correlation_gen = display.correlation(dists_gen[3],dists_gen[5],output_directory)
     #rt_correlation_gen = display.correlation(dists_gen[4],dists_gen[5],output_directory)
@@ -442,6 +567,7 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
     #score_fid_4D = test.FID_score_4D()
     #wandb.log({"summary" : wandb.Image(comparison_fig),"FID_e" : score_fid[0], "FID_x" : score_fid[1], "FID_y" : score_fid[2], "FID_z" : score_fid[3], "FID" : score_fid_4D, "time_consuming" : elapsed_time})
     wandb.log({"summary" : wandb.Image(comparison_fig)})
+    wandb.log({"scatter" : wandb.Image(scatter_fig)})
 
     
     #print(test_e)
