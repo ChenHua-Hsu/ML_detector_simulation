@@ -22,6 +22,8 @@ class GaussianFourierProjection(nn.Module):
         self.W = nn.Parameter(torch.randn(embed_dim // 2) * scale, requires_grad=False)
     def forward(self, time):
         # Multiply batch of times by network weights
+        print(time.device)
+        print(self.W.device)
         time_proj = time[:, None] * self.W[None, :] * 2 * np.pi
         # Output [sin(2pi*wt);cos(2pi*wt)]
         gauss_out = torch.cat([torch.sin(time_proj), torch.cos(time_proj)], dim=-1)

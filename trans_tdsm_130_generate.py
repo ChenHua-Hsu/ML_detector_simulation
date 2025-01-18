@@ -289,6 +289,8 @@ def train_model(files_list_, device='cpu',serialized_model=False):
             # Zero any gradients from previous steps
             optimiser.zero_grad()
             # Loss average for each batch
+            print("shower_data_device: ",shower_data.device)
+            print("incident_energy_device: ",incident_energies.device)
             loss = loss_fn(model, shower_data, incident_energies, marginal_prob_std_fn, padding_value=0.0, device=device, diffusion_on_mask=False,serialized_model=False, cp_chunks=4)
             # collect dL/dx for any parameters (x) which have requires_grad = True via: x.grad += dL/dx
             loss.backward()
