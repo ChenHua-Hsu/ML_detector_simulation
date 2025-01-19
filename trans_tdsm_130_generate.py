@@ -142,8 +142,8 @@ class ShowerDataset(Dataset):
         #     shower_data = self.transform(shower_data)
         # if self.target_transform:
         #     incident_energy = self.target_transform(incident_energy)
-        print("shape in getitem", shower_data.shape)
-        print("shape in getitem", incident_energy.shape)
+        #print("shape in getitem", shower_data.shape)
+        #print("shape in getitem", incident_energy.shape)
         return shower_data, incident_energy
 
 
@@ -159,7 +159,9 @@ class PreBatchedShowerDataset(Dataset):
         """
         self.dataset = dataset
         self.batch_size = batch_size
-        self.num_batches = len(self.dataset) // batch_size
+        #self.num_batches = len(self.dataset) // batch_size
+        self.num_samples = len(self.dataset)
+        self.num_batches = (self.num_samples + batch_size - 1) // batch_size  # Ceiling division
 
     def __len__(self):
         return self.num_batches
@@ -169,19 +171,19 @@ class PreBatchedShowerDataset(Dataset):
         Return a pre-batched set of data.
         """
         start_idx = idx * self.batch_size
-        end_idx = start_idx + self.batch_size
+        end_idx = min(start_idx + self.batch_size, self.num_samples)
         batch = [self.dataset[i] for i in range(start_idx, end_idx)]
         # Separate showers and incident energies into two lists
         batch_shower_data, batch_incident_energies = zip(*batch)
         #batch_data, batch_labels = zip(*batch)  # Separate showers and incident energies
         #batch_shower_data = torch.stack(batch_shower_data)  # Shape: [batch_size, ...]
-        print(f"PreBatchedShowerDataset: Individual sample shape = {batch_shower_data[0].shape}")
-        print(f"PreBatchedShowerDataset: Before stack, batch_shower_data = {[d.shape for d in batch_shower_data]}")
+        #print(f"PreBatchedShowerDataset: Individual sample shape = {batch_shower_data[0].shape}")
+        #print(f"PreBatchedShowerDataset: Before stack, batch_shower_data = {[d.shape for d in batch_shower_data]}")
         batch_shower_data = torch.stack(batch_shower_data)
-        print(f"PreBatchedShowerDataset: After stack, batch_shower_data.shape = {batch_shower_data.shape}")
+        #print(f"PreBatchedShowerDataset: After stack, batch_shower_data.shape = {batch_shower_data.shape}")
         batch_incident_energies = torch.tensor(batch_incident_energies)  # Shape: [batch_size]
-        print(f"PreBatchedShowerDataset: Final batch_shower_data.shape = {batch_shower_data.shape}")
-        print(f"PreBatchedShowerDataset: Final batch_incident_energies.shape = {batch_incident_energies.shape}")
+        #print(f"PreBatchedShowerDataset: Final batch_shower_data.shape = {batch_shower_data.shape}")
+        #print(f"PreBatchedShowerDataset: Final batch_incident_energies.shape = {batch_incident_energies.shape}")
 
         return batch_shower_data, batch_incident_energies
 
@@ -276,9 +278,9 @@ def train_model(files_list_, device='cpu',serialized_model=False):
         for i, (shower_data,incident_energies) in enumerate(shower_loader_train,0):
             batch_ct+=1
             # Move model to device and set dtype as same as data (note torch.double works on both CPU and GPU)
-            print(len(shower_data))
-            print(shower_data.shape)
-            print(incident_energies.shape)
+            #print(len(shower_data))
+            print("shower_data_shape: ", shower_data.shape)
+            print("incident_energy_shape: ",incident_energies.shape)
             model.to(device, shower_data.dtype)
             model.train()
             shower_data.to(device)
@@ -289,8 +291,8 @@ def train_model(files_list_, device='cpu',serialized_model=False):
             # Zero any gradients from previous steps
             optimiser.zero_grad()
             # Loss average for each batch
-            print("shower_data_device: ",shower_data.device)
-            print("incident_energy_device: ",incident_energies.device)
+            #print("shower_data_device: ",shower_data.device)
+            #print("incident_energy_device: ",incident_energies.device)
             loss = loss_fn(model, shower_data, incident_energies, marginal_prob_std_fn, padding_value=0.0, device=device, diffusion_on_mask=False,serialized_model=False, cp_chunks=4)
             # collect dL/dx for any parameters (x) which have requires_grad = True via: x.grad += dL/dx
             loss.backward()
