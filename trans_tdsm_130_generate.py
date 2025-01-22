@@ -87,22 +87,24 @@ def build_combined_dataset(files_list, batch_size, device):
         DataLoader: Combined DataLoader with data from all files, shuffled.
     """
     # Create individual datasets for each file
-    datasets = [ShowerDataset(filename, device=device) for filename in files_list]
+    #datasets = [ShowerDataset(filename, device=device) for filename in files_list]
 
     # Combine all datasets into one
-    combined_dataset = ConcatDataset(datasets)
+    #combined_dataset = ConcatDataset(datasets)
+    #combined_dataset = datasets #ConcatDataset(datasets)
 
     # Create a DataLoader with shuffling across the combined dataset\
     #print("combined_dataset", combined_dataset[0].shape)
-    pre_batched_dataset = PreBatchedShowerDataset(combined_dataset, batch_size)
+    datasets = [utils.cloud_dataset(filename, device=device) for filename in files_list]
+    pre_batched_dataset = PreBatchedShowerDataset(datasets, batch_size,shuffle = True)
     #print("pre_batched_dataset", pre_batched_dataset[0].shape)
     # Use DataLoader to shuffle pre-batched data
-    shower_loader_train = DataLoader(pre_batched_dataset, batch_size=None, shuffle=True)
+    #shower_loader_train = DataLoader(pre_batched_dataset, batch_size=None, shuffle=True)
 
 
     #shower_loader_train = DataLoader(combined_dataset, batch_size=batch_size, shuffle=True)
 
-    return shower_loader_train
+    return pre_batched_dataset #shower_loader_train
 
 class ShowerDataset(Dataset):
     def __init__(self, filename, device, transform=None, target_transform=None):
@@ -149,43 +151,59 @@ class ShowerDataset(Dataset):
 
 # Build the combined DataLoader
 class PreBatchedShowerDataset(Dataset):
-    def __init__(self, dataset, batch_size):
+    def __init__(self, datasets, batch_size,shuffle=True):
         """
-        Wrap a dataset to return pre-batched samples.
+        Wrap multiple datasets to return pre-batched samples from individual datasets.
 
         Args:
-            dataset (Dataset): The original dataset.
+            datasets (list): A list of individual datasets (one per file).
             batch_size (int): Size of each batch.
         """
-        self.dataset = dataset
+        self.datasets = datasets
         self.batch_size = batch_size
-        #self.num_batches = len(self.dataset) // batch_size
-        self.num_samples = len(self.dataset)
-        self.num_batches = (self.num_samples + batch_size - 1) // batch_size  # Ceiling division
 
+        # Create batch indices for each dataset
+        self.batches = []
+        for dataset_idx, dataset in enumerate(datasets):
+            num_samples = len(dataset)
+            num_batches = (num_samples + batch_size - 1) // batch_size  # Ceiling division
+
+            for batch_idx in range(num_batches):
+                start_idx = batch_idx * batch_size
+                end_idx = min(start_idx + batch_size, num_samples)
+                self.batches.append((dataset_idx, start_idx, end_idx))
+        #print(self.batches)
+        if shuffle:
+            random.shuffle(self.batches)
+        #print(self.batches)
     def __len__(self):
-        return self.num_batches
+        return len(self.batches)
 
     def __getitem__(self, idx):
         """
-        Return a pre-batched set of data.
+        Return a batch from a single dataset.
+
+        Args:
+            idx (int): Index of the batch.
+
+        Returns:
+            tuple: (batch_shower_data, batch_incident_energies)
         """
-        start_idx = idx * self.batch_size
-        end_idx = min(start_idx + self.batch_size, self.num_samples)
-        batch = [self.dataset[i] for i in range(start_idx, end_idx)]
+        dataset_idx, start_idx, end_idx = self.batches[idx]
+        dataset = self.datasets[dataset_idx]
+
+        # Fetch samples from the current dataset
+        batch = [dataset[i] for i in range(start_idx, end_idx)]
+
         # Separate showers and incident energies into two lists
         batch_shower_data, batch_incident_energies = zip(*batch)
-        #batch_data, batch_labels = zip(*batch)  # Separate showers and incident energies
-        #batch_shower_data = torch.stack(batch_shower_data)  # Shape: [batch_size, ...]
-        #print(f"PreBatchedShowerDataset: Individual sample shape = {batch_shower_data[0].shape}")
-        #print(f"PreBatchedShowerDataset: Before stack, batch_shower_data = {[d.shape for d in batch_shower_data]}")
-        batch_shower_data = torch.stack(batch_shower_data)
-        #print(f"PreBatchedShowerDataset: After stack, batch_shower_data.shape = {batch_shower_data.shape}")
+
+        # Convert to tensors
+        batch_shower_data = torch.stack(batch_shower_data)  # Shape: [batch_size, ...]
         batch_incident_energies = torch.tensor(batch_incident_energies)  # Shape: [batch_size]
-        #print(f"PreBatchedShowerDataset: Final batch_shower_data.shape = {batch_shower_data.shape}")
-        #print(f"PreBatchedShowerDataset: Final batch_incident_energies.shape = {batch_incident_energies.shape}")
 
         return batch_shower_data, batch_incident_energies
+
 
 
 
@@ -280,6 +298,7 @@ def train_model(files_list_, device='cpu',serialized_model=False):
             # Move model to device and set dtype as same as data (note torch.double works on both CPU and GPU)
             #print(len(shower_data))
             print("shower_data_shape: ", shower_data.shape)
+            print("################################################")
             print("incident_energy_shape: ",incident_energies.shape)
             model.to(device, shower_data.dtype)
             model.train()
@@ -850,7 +869,7 @@ def main(config=None):
             # n.b. you'll need to make sure the config hyperparams are the same as the model being used
             else:
 #                trained_model_name = 'training_20240408_1350_output/ckpt_tmp_299.pth'
-                trained_model_name = '/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/training_result/training_epoch_1000_different_shower20240901_1209_output/ckpt_tmp_500.pth'
+                trained_model_name = '/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/training_result/training_20250121_1453_output/ckpt_tmp_150.pth'
                 output_directory = generate(files_list_, load_filename=trained_model_name, device=device)
             
 
