@@ -70,9 +70,7 @@ def check_mem():
     # Print bytes in GB
     print('Memory usage of current process 0 [GB]: ', process.memory_info().rss/(1024 * 1024 * 1024))
     return
-import torch
-from torch.utils.data import Dataset, ConcatDataset, DataLoader
-import utils  # Assuming this contains your `cloud_dataset` definition
+
 
 def build_combined_dataset(files_list, batch_size, device):
     """
@@ -525,11 +523,22 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
         # Sample from 2D pdf = nhits per shower vs incident energies -> nhits and a tensor of randomly initialised hit features
         nhits, gen_hits = sampler.generate_hits(e_vs_nhits_prob, x_bin, y_bin, in_energies, 4, device=device)
 
+        # Move data to CPU before saving
+        if isinstance(gen_hits, torch.Tensor):
+            gen_hits = gen_hits.cpu()
+        if isinstance(in_energies, torch.Tensor):
+            in_energies = in_energies.cpu()
+
+        # Save to a unique file
+        file_name = f'tmp_{int(time.time())}.pt'
+        torch.save([gen_hits, in_energies], file_name)
+        print(f"Saved to {file_name}")
         # Save
-        torch.save([gen_hits, in_energies],'tmp.pt')
+        #torch.save([gen_hits, in_energies],'tmp.pt')
 
         # Load the showers of noise
-        gen_hits = utils.cloud_dataset('tmp.pt', device=device)
+        #gen_hits = utils.cloud_dataset('tmp.pt', device=device)
+        gen_hits = utils.cloud_dataset(file_name, device=device)
 
         #Set the max_nhits according to geant4 data
         gen_hits.max_nhits = max_hits
