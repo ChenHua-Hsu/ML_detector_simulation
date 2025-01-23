@@ -33,23 +33,45 @@ class cloud_dataset(Dataset):
   def __len__(self):
     return len(self.data)
   
-  def padding(self, value = 0.0):
+  # def padding(self, value = 0.0):
+  #   for showers in self.data:
+  #       if len(showers) > self.max_nhits:
+  #           self.max_nhits = len(showers)
+
+  #   padded_showers = []
+  #   padded_weights = []
+  #   for showers in self.data:
+  #     pad_hits = self.max_nhits-len(showers)
+  #     padded_shower = F.pad(input = showers, pad=(0,0,0,pad_hits), mode='constant', value = value)
+  #     padded_showers.append(padded_shower)
+  #   for weights in self.weight:
+  #     pad_hits = self.max_nhits - len(weights)
+  #     padded_weight = F.pad(input = weights, pad = (0,pad_hits), mode='constant', value=0.0)
+  #     padded_weights.append(padded_weight)
+  #   self.data = padded_showers
+  #   self.weight = padded_weights
+  def padding(self, value=0.0):
+    # Determine the maximum number of hits across all showers
     for showers in self.data:
         if len(showers) > self.max_nhits:
             self.max_nhits = len(showers)
 
+    # Pad showers and weights
     padded_showers = []
     padded_weights = []
     for showers in self.data:
-      pad_hits = self.max_nhits-len(showers)
-      padded_shower = F.pad(input = showers, pad=(0,0,0,pad_hits), mode='constant', value = value)
-      padded_showers.append(padded_shower)
+        pad_hits = self.max_nhits - len(showers)
+        padded_shower = F.pad(input=showers, pad=(0, 0, 0, pad_hits), mode='constant', value=value)
+        padded_showers.append(padded_shower)
+
     for weights in self.weight:
-      pad_hits = self.max_nhits - len(weights)
-      padded_weight = F.pad(input = weights, pad = (0,pad_hits), mode='constant', value=0.0)
-      padded_weights.append(padded_weight)
-    self.data = padded_showers
-    self.weight = padded_weights
+        pad_hits = self.max_nhits - len(weights)
+        padded_weight = F.pad(input=weights, pad=(0, pad_hits), mode='constant', value=0.0)
+        padded_weights.append(padded_weight)
+
+    # Convert padded lists back to tensors
+    self.data = [torch.tensor(shower, device=self.device) for shower in padded_showers]
+    self.weight = [torch.tensor(weight, device=self.device) for weight in padded_weights]
   def clean(self,threshold):
     count = 0
     for i, showers in enumerate(self.data):
