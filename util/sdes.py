@@ -44,7 +44,7 @@ class VPSDE:
     self.beta_0 = beta_min
     self.beta_1 = beta_max
     self.N = N
-    self.discrete_betas = torch.linspace(beta_min / N, beta_max / N, N)
+    self.discrete_betas = torch.linspace(int(beta_min) / int(N), int(beta_max) / int(N), int(N))
     self.alphas = 1. - self.discrete_betas
     self.alphas_cumprod = torch.cumprod(self.alphas, dim=0)
     self.sqrt_alphas_cumprod = torch.sqrt(self.alphas_cumprod)
