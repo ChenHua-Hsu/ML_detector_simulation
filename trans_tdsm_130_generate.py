@@ -614,7 +614,7 @@ def main(config=None):
     files_list_ = []
     print(f'Training files found in: {training_file_path}')
     for filename in os.listdir(training_file_path):
-        if fnmatch.fnmatch(filename, 'dataset_2_padded_transform_incident_later_nentry1033To1161.pt'):
+        if fnmatch.fnmatch(filename, 'dataset_2_padded_transform*.pt'):
             files_list_.append(os.path.join(training_file_path,filename))
     print(f'Files: {files_list_}')
     
