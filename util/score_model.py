@@ -163,7 +163,7 @@ class Gen(nn.Module):
         # Feed input embeddings into encoder block
         for layer in self.encoder:
             # Match dimensions and append to input
-            x += self.dense_t(embed_t_).clone()
+            #x += self.dense_t(embed_t_).clone()
             x += self.dense_e(embed_e_).clone()
             # Each encoder block takes previous blocks output as input
             # To embed the high class feature,for example, I want to add a input embedding to let it know that if energy is higher it's x,y should lower
@@ -323,9 +323,11 @@ def loss_fn(model, x, incident_energies, marginal_prob_std , padding_value=0, ep
     # Mask to avoid perturbing padded entries
     #input_mask = (x[:,:,0] != 0).unsqueeze(-1)
     mask_tensor = (~attn_padding_mask).float()[...,None]
-    
+    #print(random_t.shape)
     # Calculate mean and standard deviation of the perturbation kernel
     mean_, std_ = marginal_prob_std(x,random_t)
+    #print(mean_.shape)
+    #print(std_.shape)
     
     # Noise
     z = torch.normal(0,1,size=x.shape, device=device)

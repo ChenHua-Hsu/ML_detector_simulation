@@ -883,6 +883,98 @@ def correlation(variable1,varaible2):
 
     return correlation_penalty_et
 
+def plot_diffusion_scores(sampler, sampler_steps=100):
+    """
+    Plots the evolution of hit energy and hit x position over diffusion steps,
+    with colors representing score values.
+
+    Args:
+        sampler: An instance of pc_sampler with step_scores, step_hite, and step_hitx attributes.
+        sampler_steps: The total number of diffusion steps.
+
+    Returns:
+        fig: The matplotlib figure object containing both plots.
+    """
+    # Extract step_scores, step_hite, and step_hitx from the sampler
+    step_scores = sampler.step_scores  # Dictionary {step: list_of_scores}
+    step_scores_x = sampler.step_scores_x  # Dictionary {step: list_of_scores_x}
+    step_hite = sampler.step_hite  # Dictionary {step: list_of_hit_energies}
+    step_hitx = sampler.step_hitx  # Dictionary {step: list_of_hit_x_positions}
+
+    # Prepare data for plotting
+    x_values = []  # Step index
+    y_values_hite = []  # Hit energy values
+    y_values_hitx = []  # Hit x position values
+    color_values = []  # Score values
+    color_values_x = []  # Score values
+
+    for step in range(sampler_steps):
+        if step in step_scores and step in step_scores_x and step in step_hite and step in step_hitx:
+            scores = step_scores[step]
+            scores_x = step_scores_x[step]
+            hit_energies = step_hite[step]
+            hit_x_positions = step_hitx[step]
+
+            # Ensure all lists are the same length
+            min_length = min(len(scores), len(hit_energies))
+            scores = scores[:min_length]
+            min_length_x = min(len(scores_x), len(hit_x_positions))
+            scores_x = scores_x[:min_length_x]
+            hit_energies = hit_energies[:min_length]
+            hit_x_positions = hit_x_positions[:min_length_x]
+
+            x_values.extend([step] * min_length)
+            y_values_hite.extend(hit_energies)
+            y_values_hitx.extend(hit_x_positions)
+            color_values.extend(scores)
+            color_values_x.extend(scores_x)
+
+    # Convert to NumPy arrays
+    x_values = np.array(x_values)
+    y_values_hite = np.array(y_values_hite)
+    y_values_hitx = np.array(y_values_hitx)
+    color_values = np.array(color_values)
+    color_values_x = np.array(color_values_x)
+
+    # Fix color scale: Set midpoint at zero for diverging colormap
+    if len(color_values) > 0:
+        abs_max = max(abs(np.min(color_values)), abs(np.max(color_values)))
+        if abs_max > 0:
+            norm = plt.Normalize(vmin=-abs_max, vmax=abs_max)  # Ensure zero is centered
+
+    if len(color_values_x) > 0:
+        abs_max_x = max(abs(np.min(color_values_x)), abs(np.max(color_values_x)))
+        if abs_max_x > 0:
+            norm_x = plt.Normalize(vmin=-abs_max_x, vmax=abs_max_x)
+
+    # Create the figure and subplots
+    fig, axes = plt.subplots(2, 1, figsize=(10, 12), sharex=True)
+
+    # Scatter plot for hit energy
+    sc1 = axes[0].scatter(x_values, y_values_hite, c=color_values, cmap='seismic', alpha=0.7, norm=norm)
+    cbar1 = plt.colorbar(sc1, ax=axes[0])
+    cbar1.set_label("Score")
+    #axes[0].y_lim = (-15, 0)
+    axes[0].set_xlabel("Diffusion Step (t)")
+    axes[0].set_ylabel("Hit Energy")
+    axes[0].set_title("Evolution of Hit Energy Over Diffusion Steps (Colored by Score)")
+    axes[0].grid(True)
+
+    # Scatter plot for hit x position
+    sc2 = axes[1].scatter(x_values, y_values_hitx, c=color_values, cmap='seismic', alpha=0.7, norm=norm_x)
+    cbar2 = plt.colorbar(sc2, ax=axes[1])
+    cbar2.set_label("Score")
+    axes[1].set_xlabel("Diffusion Step (t)")
+    axes[1].set_ylabel("Hit X Position")
+    axes[1].set_title("Evolution of Hit X Position Over Diffusion Steps (Colored by Score)")
+    axes[1].grid(True)
+
+    return fig  # Return the figure object
+
+
+
+
+
 import h5py
 class High_class_feature_plot:
     def __init__(self, source_file, reference_file, output_dir):

@@ -42,6 +42,7 @@ class pc_sampler:
         
         # Objects for one cloud through all diffusion steps
         self.step_scores = { x:[] for x in range(0,sampler_steps) }
+        self.step_scores_x = { x:[] for x in range(0,sampler_steps) }
         self.step_hite = { x:[] for x in range(0,sampler_steps) }
         self.step_hitx = { x:[] for x in range(0,sampler_steps) }
         self.step_hity = { x:[] for x in range(0,sampler_steps) }
@@ -169,9 +170,10 @@ class pc_sampler:
                     grad = score_model(x, batch_time_step, sampled_energies, mask=attn_padding_mask)
                 
                 nc_steps = corrector_steps
-                self.step_scores[diffusion_step_].extend(grad[1,:,0].cpu().tolist() )
-                self.step_hite[diffusion_step_].extend(x[1,:,0].cpu().tolist())
-                self.step_hitx[diffusion_step_].extend(x[1,:,1].cpu().tolist())
+                self.step_scores[diffusion_step_].extend(torch.mean( grad[:,:,0], dim=0 ).cpu().tolist() )
+                self.step_scores_x[diffusion_step_].extend(torch.mean( grad[:,:,1], dim=0 ).cpu().tolist() )
+                self.step_hite[diffusion_step_].extend(torch.mean( x[:,:,0], dim=0 ).cpu().tolist())
+                self.step_hitx[diffusion_step_].extend(torch.mean( x[:,:,1], dim=0 ).cpu().tolist())
                 self.step_hity[diffusion_step_].extend(x[1,:,2].cpu().tolist())
                 self.step_hitz[diffusion_step_].extend(x[1,:,3].cpu().tolist())
                 
