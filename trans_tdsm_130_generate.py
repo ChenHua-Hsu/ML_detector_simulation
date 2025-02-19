@@ -81,7 +81,7 @@ def train_model(files_list_, device='cpu',serialized_model=False):
 
     wd = os.getcwd()
     #wd = '/afs/cern.ch/work/j/jthomasw/private/NTU/fast_sim/tdsm_encoder/'
-    output_files = './training_result/training_'+datetime.now().strftime('%Y%m%d_%H%M')+'_output/'
+    output_files = './training_result/training_'+str(config.SDE)+str(config.sigma_max)+str(config.sigma_min)+'_'+datetime.now().strftime('%Y%m%d_%H%M')+'_output/'
     output_directory = os.path.join(wd, output_files)
     print('Training directory: ', output_directory)
     if not os.path.exists(output_directory):
@@ -200,12 +200,12 @@ def train_model(files_list_, device='cpu',serialized_model=False):
 def generate(files_list_, load_filename, device='cpu', serialized_model=False):
 
     wd = os.getcwd()
-    output_file = './sampling_result/sampling_'+datetime.now().strftime('%Y%m%d_%H%M')+'_output/'
+    config = wandb.config
+    output_file = './sampling_result/sampling_'+str(config.SDE)+str(config.sigma_max)+str(config.sigma_min)+'_'+datetime.now().strftime('%Y%m%d_%H%M')+'_output/'
     output_directory = os.path.join(wd, output_file)
     print('Sampling directory: ', output_directory)
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
-    config = wandb.config
 
     # if config.batch_size == 64:
     #     config.num_encoder_blocks = 8
@@ -434,7 +434,10 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
     dists_gen = display.plot_distribution(gen_data, nshowers_2_plot=config.n_showers_2_gen, padding_value=0.0)
     # Distributions object for Geant4 files
     dists = display.plot_distribution(files_list_, nshowers_2_plot=config.n_showers_2_gen, padding_value=0.0)
-    comparison_fig = display.comparison_summary(dists, dists_gen, output_directory)#, erange=(-5,3), xrange=(-2.5,2.5), yrange=(-2.5,2.5), zrange=(0,1))
+    comparison_fig = display.comparison_summary(dists, dists_gen, output_directory)
+        #, erange=(-5,3), xrange=(-2.5,2.5), yrange=(-2.5,2.5), zrange=(0,1))
+    diffusion_score_fig = display.plot_diffusion_scores(sampler)
+    diffusion_score_fig.savefig(os.path.join(output_directory, 'diffusion_scores.png'))
     # Add evaluation plots to keep on wandb
     #et_correlation_gen = display.correlation(dists_gen[3],dists_gen[5],output_directory)
     #rt_correlation_gen = display.correlation(dists_gen[4],dists_gen[5],output_directory)
@@ -444,6 +447,7 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
     #score_fid_4D = test.FID_score_4D()
     #wandb.log({"summary" : wandb.Image(comparison_fig),"FID_e" : score_fid[0], "FID_x" : score_fid[1], "FID_y" : score_fid[2], "FID_z" : score_fid[3], "FID" : score_fid_4D, "time_consuming" : elapsed_time})
     wandb.log({"summary" : wandb.Image(comparison_fig)})
+    wandb.log({"diffusion_scores" : wandb.Image(diffusion_score_fig)})
 
     
     #print(test_e)
@@ -614,7 +618,7 @@ def main(config=None):
     files_list_ = []
     print(f'Training files found in: {training_file_path}')
     for filename in os.listdir(training_file_path):
-        if fnmatch.fnmatch(filename, 'dataset_2_padded_transform*.pt'):
+        if fnmatch.fnmatch(filename, 'dataset_2_padded_transform_incident_later_nentry1033*.pt'):
             files_list_.append(os.path.join(training_file_path,filename))
     print(f'Files: {files_list_}')
     
