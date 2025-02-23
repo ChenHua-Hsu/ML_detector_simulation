@@ -348,9 +348,9 @@ def loss_fn(model, x, incident_energies, marginal_prob_std ,loss_list, ine_list,
     
     # Calculate loss 
     if not weight is None:
-      losses = torch.square( scores**2*std_[:,None,None] + z ) * weight
+      losses = torch.square( scores*std_[:,None,None]**2 + z ) * weight
     else:
-      losses = torch.square( scores**2*std_[:,None,None] + z )
+      losses = torch.square( scores*std_[:,None,None]**2 + z )
 
     # Mean of losses across all hits and 4-vectors (normalise by number of hits)
     # try sum
@@ -427,7 +427,7 @@ class ScoreMatchingLoss(nn.Module):
 
         # Calculate the Denoise Score-matching objective
         # Mean the losses across all hits and 4-vectors (using sum, loss numerical value gets too large)
-        losses = torch.square( scores**2*std_[:,None,None] + z )
+        losses = torch.square( scores*std_[:,None,None]**2 + z )
         losses = torch.mean( losses, dim=(1,2) )
         scores_mean = torch.mean( scores, dim=(1,2) )
         t_list.extend(random_t.cpu().detach().numpy())
