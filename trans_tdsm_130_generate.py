@@ -334,7 +334,7 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
     sample_ = []
     # instantiate sampler 
     gen_start_time = time.time()
-    sampler = samplers.pc_sampler(sde=sde, padding_value=0.0, snr=0.16, sampler_steps=config.sampler_steps,steps2plot=plotsteps, device=device, jupyternotebook=False,serialized_model=False)
+    sampler = samplers.pc_sampler(config = config, sde=sde, padding_value=0.0, snr=0.16, sampler_steps=config.sampler_steps,steps2plot=plotsteps, device=device, jupyternotebook=False,serialized_model=False)
 
     # Collect Geant4 shower information
     geant_e = []

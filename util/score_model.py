@@ -15,7 +15,7 @@ from torch.utils.checkpoint import checkpoint_sequential
 
 class GaussianFourierProjection(nn.Module):
     """Gaussian random features for encoding time steps"""
-    def __init__(self, embed_dim, scale=30):
+    def __init__(self, embed_dim, scale=16):
         super().__init__()
         # Time information incorporated via Gaussian random feature encoding
         # Randomly sampled weights initialisation. Fixed during optimisation i.e. not trainable
@@ -170,7 +170,7 @@ class Gen(nn.Module):
         
         # Rescale models output (helps capture the normalisation of the true scores)
         mean_ , std_ = self.marginal_prob_std(x,t)
-        output = self.out(x) #/ std_[:, None, None]
+        output = self.out(x) / std_[:, None, None]
         return output
 
 ############################################
@@ -348,9 +348,9 @@ def loss_fn(model, x, incident_energies, marginal_prob_std ,loss_list, ine_list,
     
     # Calculate loss 
     if not weight is None:
-      losses = torch.square( scores*std_[:,None,None]**2 + z ) * weight
+      losses = torch.square( scores*std_[:,None,None] + z ) * weight
     else:
-      losses = torch.square( scores*std_[:,None,None]**2 + z )
+      losses = torch.square( scores*std_[:,None,None] + z )
 
     # Mean of losses across all hits and 4-vectors (normalise by number of hits)
     # try sum
@@ -427,7 +427,7 @@ class ScoreMatchingLoss(nn.Module):
 
         # Calculate the Denoise Score-matching objective
         # Mean the losses across all hits and 4-vectors (using sum, loss numerical value gets too large)
-        losses = torch.square( scores*std_[:,None,None]**2 + z )
+        losses = torch.square( scores*std_[:,None,None] + z )
         losses = torch.mean( losses, dim=(1,2) )
         scores_mean = torch.mean( scores, dim=(1,2) )
         t_list.extend(random_t.cpu().detach().numpy())

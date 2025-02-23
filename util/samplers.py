@@ -11,7 +11,7 @@ myseed = torch.seed()
 print(f"Random seed (from torch): {myseed}")
 
 class pc_sampler:
-    def __init__(self, sde, padding_value, snr=0.2, sampler_steps=100, steps2plot=(), device='cuda', eps=1e-3, jupyternotebook=False, serialized_model=False):
+    def __init__(self, config,sde, padding_value, snr=0.2, sampler_steps=100, steps2plot=(), device='cuda', eps=1e-3, jupyternotebook=False, serialized_model=False):
         ''' Generate samples from score based models with Predictor-Corrector method
             Args:
             score_model: A PyTorch model that represents the time-dependent score-based model.
@@ -28,6 +28,8 @@ class pc_sampler:
                 samples
         '''
         self.sde = sde
+        self.config = config
+        self.discrete_betas = torch.linspace(config.sigma_min / self.config.sampler_steps, self.config.sigma_max / config.sampler_steps, config.sampler_steps)
         self.diffusion_coeff_fn = functools.partial(self.sde.sde)
         self.snr = snr
         self.padding_value = padding_value
@@ -150,7 +152,7 @@ class pc_sampler:
             hist_,_,_ = np.histogram2d(x_to_hist, t_to_hist, bins = self.hist_bins)
             if self.hist is None:
                 self.hist = hist_
-
+            alphas = 1. - self.discrete_betas
             # Iterate through time steps
             for time_idx, time_step in enumerate(time_steps):
                 
@@ -161,7 +163,11 @@ class pc_sampler:
                 # if not self.jupyternotebook:
                 #     print(f"Sampler step: {time_step:.4f}") 
                 batch_time_step = torch.ones(batch_size, device=x.device) * time_step
-                alpha = torch.ones_like(torch.tensor(time_step))
+                step = self.config.sampler_steps-time_idx-1
+                if self.config.SDE == "VE":
+                    alpha = torch.ones_like(torch.tensor(time_step))
+                if self.config.SDE == "VP":
+                    alpha = torch.ones_like(torch.tensor(time_step))*alphas[step]
                 # Calculate gradients
                 if self.serialized_model:
                     grad = score_model([x, batch_time_step, sampled_energies, attn_padding_mask])

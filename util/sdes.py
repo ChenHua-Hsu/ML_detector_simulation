@@ -60,8 +60,9 @@ class VPSDE:
     # Mean and std used to define the perturbation kernel
     log_mean_coeff = -0.25 * t ** 2 * (self.beta_1 - self.beta_0) - 0.5 * t * self.beta_0
     # For t~0, the following multiplies x by a number initially ~ 1, which gets smaller as time progresses to t~1
-    mean = torch.exp(log_mean_coeff[:, None, None]) * x
-    std = torch.sqrt(1. - torch.exp(2. * log_mean_coeff))
+    mean = torch.where(torch.abs(log_mean_coeff[:,None,None]) <= 1e-3, (1+log_mean_coeff)[:,None,None]*x, torch.exp(log_mean_coeff)[:, None, None] * x)
+    #mean = torch.exp(log_mean_coeff[:, None, None]) * x
+    std = torch.where(torch.abs(log_mean_coeff <=1e-3),torch.sqrt(-2.*log_mean_coeff),torch.sqrt(1. - torch.exp(2. * log_mean_coeff)))
     return mean, std
 
   def prior_sampling(self, shape):
