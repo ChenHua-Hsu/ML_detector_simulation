@@ -145,6 +145,7 @@ def train_model(files_list_, device='cpu',serialized_model=False):
         training_loss_list = []
         training_t_list = []
         training_ine_list = []
+        training_score_list = []
         # Load files
         for filename in files_list_:
             
@@ -171,7 +172,7 @@ def train_model(files_list_, device='cpu',serialized_model=False):
                 # Zero any gradients from previous steps
                 optimiser.zero_grad()
                 # Loss average for each batch
-                loss = loss_fn(model, shower_data, incident_energies, marginal_prob_std_fn, training_loss_list,training_ine_list,training_t_list,padding_value=0.0, device=device, diffusion_on_mask=False,serialized_model=False, cp_chunks=4)
+                loss = loss_fn(model, shower_data, incident_energies,marginal_prob_std_fn, training_loss_list,training_ine_list,training_t_list, training_score_list,padding_value=0.0, device=device, diffusion_on_mask=False,serialized_model=False, cp_chunks=4)
                 # collect dL/dx for any parameters (x) which have requires_grad = True via: x.grad += dL/dx
                 loss.backward()
                 cumulative_epoch_loss+=loss.item()
@@ -190,7 +191,7 @@ def train_model(files_list_, device='cpu',serialized_model=False):
                     incident_energies = incident_energies.to(device)
                     test_loss = score_model.loss_fn(model, shower_data, incident_energies, marginal_prob_std_fn, loss_list= test_loss_list, ine_list = test_ine_list, t_list = test_t_list, padding_value=0.0, device=device,serialized_model=False, cp_chunks=4)
 
-        if epoch%10 == 0: 
+        if epoch % 10 == 0: 
             # plot
             # Assuming "B list" and "C epoch" are given as variables
             B_list_name = filename  # Replace with the actual name
@@ -228,14 +229,36 @@ def train_model(files_list_, device='cpu',serialized_model=False):
 
             # Log the plot to wandb
             wandb.log({"training_loss_distribution": wandb.Image(training_loss_distribution)})
+            plt.close()
 
+            # Plot training score (New Plot)
+            plt.figure(figsize=(8, 6))
+            scatter = plt.scatter(training_t_list, training_score_list, c=training_ine_list, cmap='viridis', marker='o')
+            plt.colorbar(scatter, label='ine_list')  # Color bar to represent the third dimension
+
+            # Labeling the axes
+            plt.xlabel('t_list')
+            plt.ylabel('score_list')
+            plt.title(f"2D Plot with Color Representing ine_list\n(B list: {B_list_name}\nEpoch: {str(C_epoch).zfill(3)})")
+
+            # Save plot to a figure
+            training_score_distribution = plt.gcf()
+
+            # Log the plot to wandb
+            wandb.log({"training_score_distribution": wandb.Image(training_score_distribution)})
+            plt.close()
+
+            # Clear lists
             test_loss_list.clear()
             test_t_list.clear()
             test_ine_list.clear()
             training_loss_list.clear()
             training_t_list.clear()
             training_ine_list.clear()
+            training_score_list.clear()  # Clear the new list
+
         scheduler.step()
+
         
         # Save checkpoints
         if epoch%10 == 0:
