@@ -13,6 +13,7 @@ plt.rcParams['font.family'] = 'serif'  # Optional: Change to a LaTeX-compatible 
 plt.rcParams['mathtext.fontset'] = 'cm'
 
 from prettytable import PrettyTable
+from scipy.stats import pearsonr, spearmanr
 #torch.manual_seed(1234)
 #np.random.seed(1234)
 # Pytorch libs
@@ -415,7 +416,7 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
             sampled_ine = torch.cat([sampled_ine,in_energies])
 
         # Sample from 2D pdf = nhits per shower vs incident energies -> nhits and a tensor of randomly initialised hit features
-        nhits, gen_hits = sampler.generate_hits(e_vs_nhits_prob, x_bin, y_bin, in_energies, 4, device=device)
+        nhits, gen_hits = sampler.generate_hits(e_vs_nhits_prob, x_bin, y_bin, in_energies, 2, device=device)
 
         # Save
         torch.save([gen_hits, in_energies],'tmp.pt')
@@ -474,12 +475,16 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
     plt.savefig(os.path.join(output_directory, 'correlation.png'))
     # gen_end_time = time.time()
     # elapsed_time = gen_end_time - gen_start_time
-    # gen_data = utils.cloud_dataset(sample_savename,device=device)
+    gen_data = utils.cloud_dataset(sample_savename,device=device)
     # # Generated distributions
-    # dists_gen = display.plot_distribution(gen_data, nshowers_2_plot=config.n_showers_2_gen, padding_value=0.0)
+    dists_gen = display.plot_distribution(gen_data, nshowers_2_plot=config.n_showers_2_gen, padding_value=0.0)
     # # Distributions object for Geant4 files
-    # dists = display.plot_distribution(files_list_, nshowers_2_plot=config.n_showers_2_gen, padding_value=0.0)
-    # comparison_fig = display.comparison_summary(dists, dists_gen, output_directory)#, erange=(-5,3), xrange=(-2.5,2.5), yrange=(-2.5,2.5), zrange=(0,1))
+    dists = display.plot_distribution(files_list_, nshowers_2_plot=config.n_showers_2_gen, padding_value=0.0)
+
+    print('geant4',pearsonr(dists[3],dists[4]))
+    #print(spearmanr(dists[3],dists[4]))
+    print('gen',pearsonr(dists_gen[3],dists_gen[4]))
+    comparison_fig = display.comparison_summary(dists, dists_gen, output_directory)#, erange=(-5,3), xrange=(-2.5,2.5), yrange=(-2.5,2.5), zrange=(0,1))
     # Add evaluation plots to keep on wandb
     #et_correlation_gen = display.correlation(dists_gen[3],dists_gen[5],output_directory)
     #rt_correlation_gen = display.correlation(dists_gen[4],dists_gen[5],output_directory)
@@ -488,7 +493,7 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
     #score_fid = test.FID_score()
     #score_fid_4D = test.FID_score_4D()
     #wandb.log({"summary" : wandb.Image(comparison_fig),"FID_e" : score_fid[0], "FID_x" : score_fid[1], "FID_y" : score_fid[2], "FID_z" : score_fid[3], "FID" : score_fid_4D, "time_consuming" : elapsed_time})
-    #wandb.log({"summary" : wandb.Image(comparison_fig)})
+    wandb.log({"summary" : wandb.Image(comparison_fig)})
 
     
     #print(test_e)
@@ -659,7 +664,7 @@ def main(config=None):
     files_list_ = []
     print(f'Training files found in: {training_file_path}')
     for filename in os.listdir(training_file_path):
-        if fnmatch.fnmatch(filename, 'dataset_2_padded_transform*.pt'):
+        if fnmatch.fnmatch(filename, 'dataset_2_padded_transform*1033*.pt'):
             files_list_.append(os.path.join(training_file_path,filename))
     print(f'Files: {files_list_}')
     

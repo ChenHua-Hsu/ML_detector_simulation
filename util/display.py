@@ -736,27 +736,27 @@ def comparison_summary(dists, dists_gen, sampling_directory, erange=(), xrange=(
 
     #ax[1][0].set_ylabel('entries')
     #ax[1][0].set_xlabel('Hit y position')
-    if len(yrange)==0:
-        bins=np.histogram(np.hstack((all_y,all_y_gen)), bins=50)[1]
-        ax[1][0].hist(all_y, bins=bins, alpha=0.5, color='orange', label='Geant4')
-        ax[1][0].hist(all_y_gen, bins=bins, alpha=0.5, color='blue', label='Gen')
-    else:
-        ax[1][0].hist(all_y, bins=40, range=yrange, alpha=0.5, color='orange', label='Geant4')
-        ax[1][0].hist(all_y_gen, bins=40, range=yrange, alpha=0.5, color='blue', label='Gen')
-    ax[1][0].set_yscale('log')
-    ax[1][0].legend(loc='upper right')
+    # if len(yrange)==0:
+    #     bins=np.histogram(np.hstack((all_y,all_y_gen)), bins=50)[1]
+    #     ax[1][0].hist(all_y, bins=bins, alpha=0.5, color='orange', label='Geant4')
+    #     ax[1][0].hist(all_y_gen, bins=bins, alpha=0.5, color='blue', label='Gen')
+    # else:
+    #     ax[1][0].hist(all_y, bins=40, range=yrange, alpha=0.5, color='orange', label='Geant4')
+    #     ax[1][0].hist(all_y_gen, bins=40, range=yrange, alpha=0.5, color='blue', label='Gen')
+    # ax[1][0].set_yscale('log')
+    # ax[1][0].legend(loc='upper right')
 
     #ax[1][1].set_ylabel('entries')
     #ax[1][1].set_xlabel('Hit z position')
-    if len(zrange)==0:
-        bins=np.histogram(np.hstack((all_z,all_z_gen)), bins=50)[1]
-        ax[1][1].hist(all_z, bins=bins, alpha=0.5, color='orange', label='Geant4')
-        ax[1][1].hist(all_z_gen, bins=bins, alpha=0.5, color='blue', label='Gen')
-    else:
-        ax[1][1].hist(all_z, bins=10, range=zrange, alpha=0.5, color='orange', label='Geant4')
-        ax[1][1].hist(all_z_gen, bins=10, range=zrange, alpha=0.5, color='blue', label='Gen')
-    ax[1][1].set_yscale('log')
-    ax[1][1].legend(loc='upper right')
+    # if len(zrange)==0:
+    #     bins=np.histogram(np.hstack((all_z,all_z_gen)), bins=50)[1]
+    #     ax[1][1].hist(all_z, bins=bins, alpha=0.5, color='orange', label='Geant4')
+    #     ax[1][1].hist(all_z_gen, bins=bins, alpha=0.5, color='blue', label='Gen')
+    # else:
+    #     ax[1][1].hist(all_z, bins=10, range=zrange, alpha=0.5, color='orange', label='Geant4')
+    #     ax[1][1].hist(all_z_gen, bins=10, range=zrange, alpha=0.5, color='blue', label='Gen')
+    # ax[1][1].set_yscale('log')
+    # ax[1][1].legend(loc='upper right')
 
     bins=np.histogram(np.hstack((all_incident_e,all_incident_e_gen)), bins=25)[1]
     #ax[1][2].set_ylabel('entries')
@@ -782,13 +782,13 @@ def comparison_summary(dists, dists_gen, sampling_directory, erange=(), xrange=(
     ax[2][1].set_yscale('log')
     ax[2][1].legend(loc='upper right')
 
-    bins=np.histogram(np.hstack((average_y_shower_geant,average_y_shower_gen)), bins=25)[1]
-    #ax[2][2].set_ylabel('entries')
-    #ax[2][2].set_xlabel('Shower Mean Y')
-    ax[2][2].hist(average_y_shower_geant, bins, alpha=0.5, color='orange', label='Geant4')
-    ax[2][2].hist(average_y_shower_gen, bins, alpha=0.5, color='blue', label='Gen')
-    ax[2][2].set_yscale('log')
-    ax[2][2].legend(loc='upper right')
+    # bins=np.histogram(np.hstack((average_y_shower_geant,average_y_shower_gen)), bins=25)[1]
+    # #ax[2][2].set_ylabel('entries')
+    # #ax[2][2].set_xlabel('Shower Mean Y')
+    # ax[2][2].hist(average_y_shower_geant, bins, alpha=0.5, color='orange', label='Geant4')
+    # ax[2][2].hist(average_y_shower_gen, bins, alpha=0.5, color='blue', label='Gen')
+    # ax[2][2].set_yscale('log')
+    # ax[2][2].legend(loc='upper right')
     
     print(f'Saving comparison plots to: {sampling_directory}') 
     #plt.savefig( os.path.join(sampling_directory,'comparison.png') )

@@ -282,6 +282,11 @@ def main():
             ax[2][0].hist(total_shower_e, 15, label='Geant4')
             ax[2][0].set_yscale('log')
             ax[2][0].legend(loc='upper right')
+
+            ax[2][1].set_ylabel('real hit x')
+            ax[2][1].set_xlabel('real hit y')
+            ax[2][1].scatter(plot_x, plot_y, label='Geant4')
+            ax[2][1].legend(loc='upper right')
             if invert_transform == 0:
                 fig_save_name = plots_path+'hit_inputs_transformed.png'
                 #fig_save_name = 'fig.png'
