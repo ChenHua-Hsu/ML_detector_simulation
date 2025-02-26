@@ -336,7 +336,9 @@ class pc_sampler:
                 correlation_matrix = torch.corrcoef(stacked)
 
                 # Extract the correlation between non_zero_elements[:, 0] and non_zero_elements[:, 1]
-                correlation = correlation.extend(correlation_matrix)
+                #correlation = correlation.extend(correlation_matrix)
+                with open ("correlation.txt","a") as file:
+                    file.write(str(correlation_matrix) + "\n")
 
                 
                 #print if there is any nan in mean
