@@ -22,9 +22,9 @@ def prepare_shell(shell_file, command, condor, FarmDir, afs_dir):
 if __name__ == '__main__':
   usage = 'usage: %prog[options]'
   parser = argparse.ArgumentParser(description=usage)
-  parser.add_argument('--config_file', type=str, default = '/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/configs/each_epoch_generate_without_randomseed.yml',help = 'configuration file for wandb')
+  parser.add_argument('--config_file', type=str, default = '/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/configs/each_epoch_generate_without_randomseed_v2.yml',help = 'configuration file for wandb')
   parser.add_argument('--python_cfg', type=str, default = 'trans_tdsm_130_generate.py', help = 'python file to run the code')
-  parser.add_argument('--n_run', type=int, default = 50, help = 'number of runs')
+  parser.add_argument('--n_run', type=int, default = 25, help = 'number of runs')
   parser.add_argument('--dryRun', action='store_true', help = 'not submit to condor')
   parser.add_argument('--afs_dir', type=str, default = '/afs/cern.ch/user/c/chenhua', help='workspace in afs space')
   parser.add_argument('--JobFlavour', type=str, default = 'nextweek', help='JobFlavour for condor')

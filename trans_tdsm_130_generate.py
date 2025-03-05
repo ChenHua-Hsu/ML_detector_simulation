@@ -100,7 +100,7 @@ def train_model(files_list_, device='cpu',serialized_model=False):
     # Instantiate model
     loss_fn = score_model.ScoreMatchingLoss()
     if not serialized_model:
-        model = score_model.Gen(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, marginal_prob_std=marginal_prob_std_fn)
+        model = score_model.Gen(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, marginal_prob_std=marginal_prob_std_fn, scale = config.Fourier_projection_feature)
     else:
         model = score_model.get_seq_model(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, marginal_prob_std=marginal_prob_std_fn)
     #model = score_model.Gen(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, marginal_prob_std=marginal_prob_std_fn)
@@ -222,7 +222,7 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
 
     # Load saved model
     if not serialized_model:
-        model = score_model.Gen(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, marginal_prob_std=marginal_prob_std_fn)
+        model = score_model.Gen(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, marginal_prob_std=marginal_prob_std_fn, scale = config.Fourier_projection_feature)
     else:
         model = score_model.get_seq_model(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, marginal_prob_std=marginal_prob_std_fn)
     #model=score_model.Gen(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, marginal_prob_std=marginal_prob_std_fn)
@@ -939,7 +939,7 @@ def main(config=None):
             wandb.log({"summary" : wandb.Image(plot_energy_z_plt)})
             wandb.log({"summary" : wandb.Image(r_width_plt)})
             wandb.log({"summary" : wandb.Image(max_voxel_dep_energy_layer_plt)}) 
-            os.system('python3 util/evaluate_image_based.py -m all --output_dir {outdir} --input_file {Gen_file} --reference_file {Geant4_file} --dataset 2'.format(Gen_file = os.path.join(output_directory, 'Gen.h5'), Geant4_file = os.path.join(output_directory, 'Reference_0.h5'), outdir = os.path.join(output_directory, 'calo_score')))
+            os.system('python3 util/evaluate_image_based.py -m all --output_dir {outdir} --input_file {Gen_file} --reference_file {Geant4_file} --dataset 2'.format(Gen_file = os.path.join(output_directory, 'Gen.h5'), Geant4_file = os.path.join(output_directory, 'combined_Geant4.h5'), outdir = os.path.join(output_directory, 'calo_score')))
             wandb.log({"summary" : wandb.Image(os.path.join(output_directory, 'calo_score', 'reference_average_shower_dataset_2.png'))})
             wandb.log({"summary" : wandb.Image(os.path.join(output_directory, 'calo_score', 'average_shower_dataset_2.png'))})
             wandb.log({"summary":  wandb.Image(os.path.join(output_directory, 'calo_score', 'voxel_energy_dataset_2.png'))})
