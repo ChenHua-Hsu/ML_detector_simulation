@@ -805,7 +805,7 @@ def main(config=None):
             workingdir = os.getcwd()
             #out = './'
             if not switches_>>2 & trigger:
-              output_directory = os.path.join(workingdir,'sampling_result/sampling_20240701_1628_output')
+              output_directory = os.path.join(workingdir,'sampling_result/sampling_20250225_1636_output')
             #output_directory = os.path.join(workingdir,'sampling_20240708_2258_output')
             print(f'Evaluation outputs stored here: {output_directory}')
             plot_file_name = os.path.join(output_directory, 'sample.pt')
@@ -1011,7 +1011,7 @@ def main(config=None):
             wandb.log({"summary" : wandb.Image(plot_energy_z_plt)})
             wandb.log({"summary" : wandb.Image(r_width_plt)})
             wandb.log({"summary" : wandb.Image(max_voxel_dep_energy_layer_plt)}) 
-            os.system('python3 util/evaluate_image_based.py -m all --output_dir {outdir} --input_file {Gen_file} --reference_file {Geant4_file} --dataset 2'.format(Gen_file = os.path.join(output_directory, 'Gen.h5'), Geant4_file = os.path.join(output_directory, 'Reference_0.h5'), outdir = os.path.join(output_directory, 'calo_score')))
+            os.system('python3 util/evaluate_image_based.py -m all --output_dir {outdir} --input_file {Gen_file} --reference_file {Geant4_file} --dataset 2'.format(Gen_file = os.path.join(output_directory, 'Gen.h5'), Geant4_file = os.path.join(output_directory, 'combined_Geant4.h5'), outdir = os.path.join(output_directory, 'calo_score')))
             wandb.log({"summary" : wandb.Image(os.path.join(output_directory, 'calo_score', 'reference_average_shower_dataset_2.png'))})
             wandb.log({"summary" : wandb.Image(os.path.join(output_directory, 'calo_score', 'average_shower_dataset_2.png'))})
             wandb.log({"summary":  wandb.Image(os.path.join(output_directory, 'calo_score', 'voxel_energy_dataset_2.png'))})
