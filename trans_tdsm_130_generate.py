@@ -180,7 +180,13 @@ def train_model(files_list_, device='cpu',serialized_model=False):
         # Load files
         #for filename in files_list_:
             #file_counter+=1
-
+        test_loss_list = []
+        test_t_list = []
+        test_ine_list = []
+        training_loss_list = []
+        training_t_list = []
+        training_ine_list = []
+        training_score_list = []
         # Build dataset
         shower_loader_train, shower_loader_test = build_combined_dataset_split(files_list_, config.train_ratio, config.batch_size, device)
 
@@ -204,7 +210,7 @@ def train_model(files_list_, device='cpu',serialized_model=False):
             # Loss average for each batch
             #print("shower_date_device: ", shower_data.device)
             #print("incident_energies_device: ", incident_energies.device)
-            loss = loss_fn(model, shower_data, incident_energies, marginal_prob_std_fn, padding_value=0.0, device=device, diffusion_on_mask=False,serialized_model=False, cp_chunks=4)
+            loss = loss_fn(model, shower_data, incident_energies,marginal_prob_std_fn, training_loss_list,training_ine_list,training_t_list, training_score_list,padding_value=0.0, device=device, diffusion_on_mask=False,serialized_model=False, cp_chunks=4)
             # collect dL/dx for any parameters (x) which have requires_grad = True via: x.grad += dL/dx
             loss.backward()
             cumulative_epoch_loss+=loss.item()
@@ -221,13 +227,77 @@ def train_model(files_list_, device='cpu',serialized_model=False):
                 model.eval()
                 shower_data = shower_data.to(device)
                 incident_energies = incident_energies.to(device)
-                test_loss = score_model.loss_fn(model, shower_data, incident_energies, marginal_prob_std_fn, padding_value=0.0, device=device,serialized_model=False, cp_chunks=4)
+                test_loss = score_model.loss_fn(model, shower_data, incident_energies, marginal_prob_std_fn, loss_list= test_loss_list, ine_list = test_ine_list, t_list = test_t_list, padding_value=0.0, device=device,serialized_model=False, cp_chunks=4)
 
         scheduler.step()
         
         # Save checkpoints
         if epoch%10 == 0:
             torch.save(model.state_dict(), os.path.join(output_directory, 'ckpt_tmp_'+str(epoch)+'.pth' ))
+            # plot
+            # Assuming "B list" and "C epoch" are given as variables
+            #B_list_name = filename  # Replace with the actual name
+            C_epoch = epoch  # Replace with the actual epoch number
+
+            # Create a 2D scatter plot with color representing the third dimension (ine_list)
+            plt.figure(figsize=(8, 6))
+            scatter = plt.scatter(test_t_list, test_loss_list, c=test_ine_list, cmap='viridis', marker='o')
+            plt.colorbar(scatter, label='ine_list')  # Color bar to represent the third dimension
+
+            # Labeling the axes
+            plt.xlabel('t_list')
+            plt.ylabel('loss_list')
+            plt.title(f"2D Plot with Color Representing ine_list\nEpoch: {str(C_epoch).zfill(3)})")
+
+            # Save plot to a figure
+            loss_distribution = plt.gcf()
+
+            # Log the plot to wandb
+            wandb.log({"test_loss_distribution": wandb.Image(loss_distribution)})
+            plt.close()
+
+            # Plot training loss
+            plt.figure(figsize=(8, 6))
+            scatter = plt.scatter(training_t_list, training_loss_list, c=training_ine_list, cmap='viridis', marker='o')
+            plt.colorbar(scatter, label='ine_list')  # Color bar to represent the third dimension
+
+            # Labeling the axes
+            plt.xlabel('t_list')
+            plt.ylabel('loss_list')
+            plt.title(f"2D Plot with Color Representing ine_list\nEpoch: {str(C_epoch).zfill(3)})")
+
+            # Save plot to a figure
+            training_loss_distribution = plt.gcf()
+
+            # Log the plot to wandb
+            wandb.log({"training_loss_distribution": wandb.Image(training_loss_distribution)})
+            plt.close()
+
+            # Plot training score (New Plot)
+            plt.figure(figsize=(8, 6))
+            scatter = plt.scatter(training_t_list, training_score_list, c=training_ine_list, cmap='viridis', marker='o')
+            plt.colorbar(scatter, label='ine_list')  # Color bar to represent the third dimension
+
+            # Labeling the axes
+            plt.xlabel('t_list')
+            plt.ylabel('score_list')
+            plt.title(f"2D Plot with Color Representing ine_list\nEpoch: {str(C_epoch).zfill(3)})")
+
+            # Save plot to a figure
+            training_score_distribution = plt.gcf()
+
+            # Log the plot to wandb
+            wandb.log({"training_score_distribution": wandb.Image(training_score_distribution)})
+            plt.close()
+
+            # Clear lists
+            test_loss_list.clear()
+            test_t_list.clear()
+            test_ine_list.clear()
+            training_loss_list.clear()
+            training_t_list.clear()
+            training_ine_list.clear()
+            training_score_list.clear()  # Clear the new list
     
     save_name = os.path.join(output_directory, 'ckpt_tmp_'+str(epoch)+'.pth' )
     torch.save(model.state_dict(), save_name)

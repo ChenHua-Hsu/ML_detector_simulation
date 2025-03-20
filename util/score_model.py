@@ -297,7 +297,7 @@ def get_seq_model(n_feat_dim, embed_dim, hidden_dim, num_encoder_blocks, num_att
     return seq_model
 
 
-def loss_fn(model, x, incident_energies, marginal_prob_std , padding_value=0, eps=1e-3, device='cpu', diffusion_on_mask=False, serialized_model=False, cp_chunks=0, weight=None):
+def loss_fn(model, x, incident_energies, marginal_prob_std ,loss_list, ine_list, t_list,  padding_value=0, eps=1e-3, device='cpu', diffusion_on_mask=False, serialized_model=False, cp_chunks=0, weight=None):
 
     """The loss function for training score-based generative models
     Uses the weighted sum of Denoising Score matching objectives
@@ -388,7 +388,10 @@ def loss_fn(model, x, incident_energies, marginal_prob_std , padding_value=0, ep
     # Calculate the Denoise Score-matching objective
     # Mean the losses across all hits and 4-vectors (using sum, loss numerical value gets too large)
     losses = torch.mean( losses, dim=(1,2) )
-
+    t_list.extend(random_t.cpu().detach().numpy())
+    loss_list.extend(losses.cpu().detach().numpy())
+    
+    ine_list.extend(incident_energies.cpu().detach().numpy())
     # Mean loss for batch
     batch_loss = torch.mean( losses )
     
@@ -407,7 +410,7 @@ class ScoreMatchingLoss(nn.Module):
         # register components of nn.Module to custom loss
         super(ScoreMatchingLoss, self).__init__()
         
-    def forward(self, model, x, incident_energies, marginal_prob_std , padding_value=0, eps=1e-3, device='cpu', diffusion_on_mask=False, serialized_model=False, cp_chunks=0):
+    def forward(self, model, x, incident_energies, marginal_prob_std ,loss_list,ine_list,t_list,score_list, padding_value=0, eps=1e-3, device='cpu', diffusion_on_mask=False, serialized_model=False, cp_chunks=0):
         
         '''
         Forward method used to calculate value:
@@ -454,6 +457,11 @@ class ScoreMatchingLoss(nn.Module):
         # Mean the losses across all hits and 4-vectors (using sum, loss numerical value gets too large)
         losses = torch.square( scores*std_[:,None,None] + z )
         losses = torch.mean( losses, dim=(1,2) )
+        scores_mean = torch.mean( scores, dim=(1,2) )
+        t_list.extend(random_t.cpu().detach().numpy())
+        loss_list.extend(losses.cpu().detach().numpy())
+        score_list.extend(scores_mean.cpu().detach().numpy())
+        ine_list.extend(incident_energies.cpu().detach().numpy())
 
         # Mean loss for batch
         batch_loss = torch.mean( losses )
