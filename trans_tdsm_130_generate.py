@@ -64,6 +64,43 @@ def build_dataset(filename, train_ratio, batch_size, device):
     shower_loader_test = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
     return shower_loader_train, shower_loader_test
 
+def build_combined_dataset_split(files_list, train_ratio, batch_size, device):
+    """
+    Build combined training and testing datasets from multiple files while
+    maintaining the train_ratio for each file.
+
+    Args:
+        files_list (list): List of file paths.
+        train_ratio (float): Fraction of each file's data to use for training.
+        batch_size (int): Batch size for pre-batching.
+        device (torch.device): Device on which the datasets will be loaded.
+
+    Returns:
+        tuple: (train_prebatched, test_prebatched) pre-batched datasets for training and testing.
+    """
+    train_datasets = []
+    test_datasets = []
+    
+    for filename in files_list:
+        # Load the dataset from file
+        dataset = utils.cloud_dataset(filename, device=device)
+        
+        # Determine split sizes
+        train_size = int(train_ratio * len(dataset))
+        test_size = len(dataset) - train_size
+        
+        # Split the dataset into train and test subsets
+        train_subset, test_subset = torch.utils.data.random_split(dataset, [train_size, test_size])
+        
+        train_datasets.append(train_subset)
+        test_datasets.append(test_subset)
+    
+    # Create pre-batched datasets for training and testing
+    train_prebatched = utils.PreBatchedShowerDataset(train_datasets, batch_size, shuffle=True)
+    test_prebatched = utils.PreBatchedShowerDataset(test_datasets, batch_size, shuffle=True)
+    
+    return train_prebatched, test_prebatched
+
 def check_mem():
     # Resident set size memory (non-swap physical memory process has used)
     process = psutil.Process(os.getpid())
@@ -141,50 +178,50 @@ def train_model(files_list_, device='cpu',serialized_model=False):
         testing_batches_per_epoch = 0
 
         # Load files
-        for filename in files_list_:
-            file_counter+=1
+        #for filename in files_list_:
+            #file_counter+=1
 
-            # Build dataset
-            shower_loader_train, shower_loader_test = build_dataset(filename, config.train_ratio, config.batch_size, device)
+        # Build dataset
+        shower_loader_train, shower_loader_test = build_combined_dataset_split(files_list_, config.train_ratio, config.batch_size, device)
 
-            # Accumuate number of batches per epoch
-            training_batches_per_epoch += len(shower_loader_train)
-            testing_batches_per_epoch += len(shower_loader_test)
-            
-            # Load shower batch for training
-            for i, (shower_data,incident_energies) in enumerate(shower_loader_train,0):
-                batch_ct+=1
-                # Move model to device and set dtype as same as data (note torch.double works on both CPU and GPU)
+        # Accumuate number of batches per epoch
+        training_batches_per_epoch += len(shower_loader_train)
+        testing_batches_per_epoch += len(shower_loader_test)
+        
+        # Load shower batch for training
+        for i, (shower_data,incident_energies) in enumerate(shower_loader_train,0):
+            batch_ct+=1
+            # Move model to device and set dtype as same as data (note torch.double works on both CPU and GPU)
+            model.to(device, shower_data.dtype)
+            model.train()
+            shower_data.to(device)
+            incident_energies.to(device)
+            if len(shower_data) < 1:
+                continue
+
+            # Zero any gradients from previous steps
+            optimiser.zero_grad()
+            # Loss average for each batch
+            #print("shower_date_device: ", shower_data.device)
+            #print("incident_energies_device: ", incident_energies.device)
+            loss = loss_fn(model, shower_data, incident_energies, marginal_prob_std_fn, padding_value=0.0, device=device, diffusion_on_mask=False,serialized_model=False, cp_chunks=4)
+            # collect dL/dx for any parameters (x) which have requires_grad = True via: x.grad += dL/dx
+            loss.backward()
+            cumulative_epoch_loss+=loss.item()
+            # Update value of x += -lr * x.grad
+            optimiser.step()
+            # Report metrics every 5th batch
+            if ((batch_ct + 1) % 5) == 0:
+                train_log(loss, batch_ct, epoch)
+        
+        # Testing on subset of file
+        for i, (shower_data,incident_energies) in enumerate(shower_loader_test,0):
+            with torch.no_grad():
                 model.to(device, shower_data.dtype)
-                model.train()
-                shower_data.to(device)
-                incident_energies.to(device)
-                if len(shower_data) < 1:
-                    continue
-
-                # Zero any gradients from previous steps
-                optimiser.zero_grad()
-                # Loss average for each batch
-                #print("shower_date_device: ", shower_data.device)
-                #print("incident_energies_device: ", incident_energies.device)
-                loss = loss_fn(model, shower_data, incident_energies, marginal_prob_std_fn, padding_value=0.0, device=device, diffusion_on_mask=False,serialized_model=False, cp_chunks=4)
-                # collect dL/dx for any parameters (x) which have requires_grad = True via: x.grad += dL/dx
-                loss.backward()
-                cumulative_epoch_loss+=loss.item()
-                # Update value of x += -lr * x.grad
-                optimiser.step()
-                # Report metrics every 5th batch
-                if ((batch_ct + 1) % 5) == 0:
-                    train_log(loss, batch_ct, epoch)
-            
-            # Testing on subset of file
-            for i, (shower_data,incident_energies) in enumerate(shower_loader_test,0):
-                with torch.no_grad():
-                    model.to(device, shower_data.dtype)
-                    model.eval()
-                    shower_data = shower_data.to(device)
-                    incident_energies = incident_energies.to(device)
-                    test_loss = score_model.loss_fn(model, shower_data, incident_energies, marginal_prob_std_fn, padding_value=0.0, device=device,serialized_model=False, cp_chunks=4)
+                model.eval()
+                shower_data = shower_data.to(device)
+                incident_energies = incident_energies.to(device)
+                test_loss = score_model.loss_fn(model, shower_data, incident_energies, marginal_prob_std_fn, padding_value=0.0, device=device,serialized_model=False, cp_chunks=4)
 
         scheduler.step()
         

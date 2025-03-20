@@ -4,6 +4,7 @@ from torch.nn.functional import normalize
 from torch.utils.data import Dataset
 from sklearn.preprocessing import RobustScaler
 import torch.nn.functional as F
+import random
 
 class cloud_dataset(Dataset):
   def __init__(self, filename, transform=None, transform_y=None, device='cpu'):
@@ -80,6 +81,60 @@ class cloud_dataset(Dataset):
         showers[showers > threshold] = threshold
         count += 1
 
+# Build the combined DataLoader
+class PreBatchedShowerDataset(Dataset):
+    def __init__(self, datasets, batch_size,shuffle=True):
+        """
+        Wrap multiple datasets to return pre-batched samples from individual datasets.
+
+        Args:
+            datasets (list): A list of individual datasets (one per file).
+            batch_size (int): Size of each batch.
+        """
+        self.datasets = datasets
+        self.batch_size = batch_size
+
+        # Create batch indices for each dataset
+        self.batches = []
+        for dataset_idx, dataset in enumerate(datasets):
+            num_samples = len(dataset)
+            num_batches = (num_samples+batch_size - 1) // batch_size  # Ceiling division
+
+            for batch_idx in range(num_batches):
+                start_idx = batch_idx * batch_size
+                end_idx = min(start_idx+batch_size, num_samples)
+                self.batches.append((dataset_idx, start_idx, end_idx))
+        #print(self.batches)
+        if shuffle:
+            random.shuffle(self.batches)
+        #print(self.batches)
+    def __len__(self):
+        return len(self.batches)
+
+    def __getitem__(self, idx):
+        """
+        Return a batch from a single dataset.
+
+        Args:
+            idx (int): Index of the batch.
+
+        Returns:
+            tuple: (batch_shower_data, batch_incident_energies)
+        """
+        dataset_idx, start_idx, end_idx = self.batches[idx]
+        dataset = self.datasets[dataset_idx]
+
+        # Fetch samples from the current dataset
+        batch = [dataset[i] for i in range(start_idx, end_idx)]
+
+        # Separate showers and incident energies into two lists
+        batch_shower_data, batch_incident_energies = zip(*batch)
+
+        # Convert to tensors
+        batch_shower_data = torch.stack(batch_shower_data)  # Shape: [batch_size, ...]
+        batch_incident_energies = torch.tensor(batch_incident_energies)  # Shape: [batch_size]
+
+        return batch_shower_data, batch_incident_energies
 class rescale_conditional:
   '''Convert hit energies to range |01)
   '''
