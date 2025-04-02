@@ -232,65 +232,67 @@ def train_model(files_list_, device='cpu',serialized_model=False):
         scheduler.step()
         
         # Save checkpoints
+        
         if epoch%10 == 0:
             torch.save(model.state_dict(), os.path.join(output_directory, 'ckpt_tmp_'+str(epoch)+'.pth' ))
-            # plot
-            # Assuming "B list" and "C epoch" are given as variables
-            #B_list_name = filename  # Replace with the actual name
-            C_epoch = epoch  # Replace with the actual epoch number
+            if config.save_plot_in_training:
+                # plot
+                # Assuming "B list" and "C epoch" are given as variables
+                #B_list_name = filename  # Replace with the actual name
+                C_epoch = epoch  # Replace with the actual epoch number
 
-            # Create a 2D scatter plot with color representing the third dimension (ine_list)
-            plt.figure(figsize=(8, 6))
-            scatter = plt.scatter(test_t_list, test_loss_list, c=test_ine_list, cmap='viridis', marker='o')
-            plt.colorbar(scatter, label='ine_list')  # Color bar to represent the third dimension
+                # Create a 2D scatter plot with color representing the third dimension (ine_list)
+                plt.figure(figsize=(8, 6))
+                scatter = plt.scatter(test_t_list, test_loss_list, c=test_ine_list, cmap='viridis', marker='o')
+                plt.colorbar(scatter, label='ine_list')  # Color bar to represent the third dimension
 
-            # Labeling the axes
-            plt.xlabel('t_list')
-            plt.ylabel('loss_list')
-            plt.title(f"2D Plot with Color Representing ine_list\nEpoch: {str(C_epoch).zfill(3)})")
+                # Labeling the axes
+                plt.xlabel('t_list')
+                plt.ylabel('loss_list')
+                plt.title(f"2D Plot with Color Representing ine_list\nEpoch: {str(C_epoch).zfill(3)})")
 
-            # Save plot to a figure
-            loss_distribution = plt.gcf()
+                # Save plot to a figure
+                loss_distribution = plt.gcf()
 
-            # Log the plot to wandb
-            wandb.log({"test_loss_distribution": wandb.Image(loss_distribution)})
-            plt.close()
+                # Log the plot to wandb
+                wandb.log({"test_loss_distribution": wandb.Image(loss_distribution)})
+                plt.close()
 
-            # Plot training loss
-            plt.figure(figsize=(8, 6))
-            scatter = plt.scatter(training_t_list, training_loss_list, c=training_ine_list, cmap='viridis', marker='o')
-            plt.colorbar(scatter, label='ine_list')  # Color bar to represent the third dimension
+                # Plot training loss
+                plt.figure(figsize=(8, 6))
+                scatter = plt.scatter(training_t_list, training_loss_list, c=training_ine_list, cmap='viridis', marker='o')
+                plt.colorbar(scatter, label='ine_list')  # Color bar to represent the third dimension
 
-            # Labeling the axes
-            plt.xlabel('t_list')
-            plt.ylabel('loss_list')
-            plt.title(f"2D Plot with Color Representing ine_list\nEpoch: {str(C_epoch).zfill(3)})")
+                # Labeling the axes
+                plt.xlabel('t_list')
+                plt.ylabel('loss_list')
+                plt.title(f"2D Plot with Color Representing ine_list\nEpoch: {str(C_epoch).zfill(3)})")
 
-            # Save plot to a figure
-            training_loss_distribution = plt.gcf()
+                # Save plot to a figure
+                training_loss_distribution = plt.gcf()
 
-            # Log the plot to wandb
-            wandb.log({"training_loss_distribution": wandb.Image(training_loss_distribution)})
-            plt.close()
+                # Log the plot to wandb
+                wandb.log({"training_loss_distribution": wandb.Image(training_loss_distribution)})
+                plt.close()
 
-            # Plot training score (New Plot)
-            plt.figure(figsize=(8, 6))
-            scatter = plt.scatter(training_t_list, training_score_list, c=training_ine_list, cmap='viridis', marker='o')
-            plt.colorbar(scatter, label='ine_list')  # Color bar to represent the third dimension
+                # Plot training score (New Plot)
+                plt.figure(figsize=(8, 6))
+                scatter = plt.scatter(training_t_list, training_score_list, c=training_ine_list, cmap='viridis', marker='o')
+                plt.colorbar(scatter, label='ine_list')  # Color bar to represent the third dimension
 
-            # Labeling the axes
-            plt.xlabel('t_list')
-            plt.ylabel('score_list')
-            plt.title(f"2D Plot with Color Representing ine_list\nEpoch: {str(C_epoch).zfill(3)})")
+                # Labeling the axes
+                plt.xlabel('t_list')
+                plt.ylabel('score_list')
+                plt.title(f"2D Plot with Color Representing ine_list\nEpoch: {str(C_epoch).zfill(3)})")
 
-            # Save plot to a figure
-            training_score_distribution = plt.gcf()
+                # Save plot to a figure
+                training_score_distribution = plt.gcf()
 
-            # Log the plot to wandb
-            wandb.log({"training_score_distribution": wandb.Image(training_score_distribution)})
-            plt.close()
+                # Log the plot to wandb
+                wandb.log({"training_score_distribution": wandb.Image(training_score_distribution)})
+                plt.close()
 
-            # Clear lists
+                # Clear lists
             test_loss_list.clear()
             test_t_list.clear()
             test_ine_list.clear()
