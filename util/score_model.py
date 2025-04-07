@@ -19,11 +19,13 @@ class GaussianFourierProjection(nn.Module):
         super().__init__()
         # Time information incorporated via Gaussian random feature encoding
         # Randomly sampled weights initialisation. Fixed during optimisation i.e. not trainable
-        self.W = nn.Parameter(torch.randn(embed_dim // 2) * scale, requires_grad=False)
+        W = torch.randn(embed_dim // 2) * scale
+        self.register_buffer("W", W) # To solve the device issue
     def forward(self, time):
         # Multiply batch of times by network weights
         #print("time_device: ",time.device)
         #print("W_device: ",self.W.device)
+        #W = self.W.to(time.device)
         time_proj = time[:, None] * self.W[None, :] * 2 * np.pi
         # Output [sin(2pi*wt);cos(2pi*wt)]
         gauss_out = torch.cat([torch.sin(time_proj), torch.cos(time_proj)], dim=-1)
@@ -100,7 +102,7 @@ class Block(nn.Module):
         return x
 
 class Gen(nn.Module):
-    def __init__(self, n_feat_dim, embed_dim, hidden_dim, num_encoder_blocks, num_attn_heads, dropout_gen, marginal_prob_std, scale,  **kwargs):
+    def __init__(self, n_feat_dim, embed_dim, hidden_dim, num_encoder_blocks, num_attn_heads, dropout_gen, marginal_prob_std, ine_scale,t_scale,  **kwargs):
         """Transformer encoder model
         Arguments:
         n_feat_dim = number of features
@@ -115,8 +117,8 @@ class Gen(nn.Module):
         # Embedding: size of input (n_feat_dim) features -> size of output (embed_dim)
         self.embed = nn.Linear(n_feat_dim, embed_dim)
         # Seperate embedding for (time/incident energy) conditional inputs (small NN with fixed weights)
-        self.embed_e = nn.Sequential(GaussianFourierProjection(embed_dim=embed_dim, scale=scale), nn.Linear(embed_dim, embed_dim))
-        self.embed_t = nn.Sequential(GaussianFourierProjection(embed_dim=embed_dim, scale=scale), nn.Linear(embed_dim, embed_dim))
+        self.embed_e = nn.Sequential(GaussianFourierProjection(embed_dim=embed_dim, scale=ine_scale), nn.Linear(embed_dim, embed_dim))
+        self.embed_t = nn.Sequential(GaussianFourierProjection(embed_dim=embed_dim, scale=t_scale), nn.Linear(embed_dim, embed_dim))
         # Boils embedding down to single value
         self.dense_t = Dense(embed_dim, 1)
         self.dense_e = Dense(embed_dim, 1)
@@ -157,6 +159,9 @@ class Gen(nn.Module):
         # Embed incident particle energy
         embed_e_ = self.act_sig( self.embed_e(e) )
         # 'class' token (mean field)
+        x = x.to(t.device)
+        embed_t_ = embed_t_.to(t.device)
+        embed_e_ = embed_e_.to(t.device)
         x_cls = self.cls_token.expand(x.size(0), 1, -1)
         
         
@@ -443,7 +448,11 @@ class ScoreMatchingLoss(nn.Module):
         perturbed_x = mean_ + std_[:, None, None]*z
         if not diffusion_on_mask:
           perturbed_x = perturbed_x*mask_tensor
-
+        
+        perturbed_x = perturbed_x.to(device)
+        random_t = random_t.to(device)
+        incident_energies = incident_energies.to(device)
+        attn_padding_mask = attn_padding_mask.to(device)
         # Evaluate model (aim: to estimate the score function of each noise-perturbed distribution)
         if serialized_model:
             if cp_chunks == 0:

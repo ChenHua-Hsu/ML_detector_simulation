@@ -137,7 +137,7 @@ def train_model(files_list_, device='cpu',serialized_model=False):
     # Instantiate model
     loss_fn = score_model.ScoreMatchingLoss()
     if not serialized_model:
-        model = score_model.Gen(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, marginal_prob_std=marginal_prob_std_fn, scale = config.Fourier_projection_feature)
+        model = score_model.Gen(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, marginal_prob_std=marginal_prob_std_fn, ine_scale = config.Fourier_ine_projection_feature, t_scale = config.Fourier_t_projection_feature)
     else:
         model = score_model.get_seq_model(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, marginal_prob_std=marginal_prob_std_fn)
     #model = score_model.Gen(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, marginal_prob_std=marginal_prob_std_fn)
@@ -331,7 +331,7 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
 
     # Load saved model
     if not serialized_model:
-        model = score_model.Gen(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, marginal_prob_std=marginal_prob_std_fn, scale = config.Fourier_projection_feature)
+        model = score_model.Gen(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, marginal_prob_std=marginal_prob_std_fn, ine_scale = config.Fourier_ine_projection_feature, t_scale = config.Fourier_t_projection_feature)
     else:
         model = score_model.get_seq_model(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, marginal_prob_std=marginal_prob_std_fn)
     #model=score_model.Gen(config.n_feat_dim, config.embed_dim, config.hidden_dim, config.num_encoder_blocks, config.num_attn_heads, config.dropout_gen, marginal_prob_std=marginal_prob_std_fn)
