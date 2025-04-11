@@ -10,7 +10,7 @@ parameters:
   lr:
     value: 0.003
   epochs:
-    value: 200
+    value: 500
   n_feat_dim: 
     value: 4
   embed_dim: 
@@ -24,18 +24,20 @@ parameters:
   dropout_gen:
     value: 0.2
   SDE:
-    value : "VE"
+    values : ["VE","VP"]
   sigma_max: 
     values: [1.0,5.0,10.0,20.0,50.0]
   sigma_min: 
     value: 0.0001
   sampler_steps:
-    value: 100
+    values: [100,1000]
   n_showers_2_gen: 
-    value: 10000
+    value: 50000
   correction_steps:
-    value: 25
-  Fourier_projection_feature :
+    values: [10,25]
+  Fourier_ine_projection_feature :
+    values : [4,8,16,30]
+  Fourier_t_projection_feature :
     values : [4,8,16,30]
   save_plot_in_training:
     value: False
