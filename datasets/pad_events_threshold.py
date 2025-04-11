@@ -45,7 +45,7 @@ def main():
     
     # For each file
     for infile in os.listdir(indir):
-        if fnmatch.fnmatch(infile, 'dataset_2_tensor_no_padding_euclidian_nentry5548To5676.pt'):
+        if fnmatch.fnmatch(infile, 'dataset_2_tensor_no_padding_euclidian_nentry*.pt'):
             filename = os.path.join(indir,infile)
             ofile = infile.replace("tensor_no_padding_euclidian", "padded_transform_incident_later" )
             opath = './'
@@ -225,14 +225,14 @@ def main():
             plot_z = all_z
 
             #Write a code to examine the list that I want to plot later if it contains any NAN values
-            print(f'Number of NAN values in all_incident_e: {np.isnan(all_incident_e).sum()}')
-            print(f'Number of NAN values in total_shower_e: {np.isnan(total_shower_e).sum()}')
-            print(f'Number of NAN values in n_hits: {np.isnan(n_hits).sum()}')
-            print(f'Number of NAN values in nhits: {np.isnan(nhits).sum()}')
-            print(f'Number of NAN values in all_x: {np.isnan(all_x).sum()}')
-            print(f'Number of NAN values in all_y: {np.isnan(all_y).sum()}')
-            print(f'Number of NAN values in all_z: {np.isnan(all_z).sum()}')
-            print(f'Number of NAN values in all_e: {np.isnan(all_e).sum()}')
+            # print(f'Number of NAN values in all_incident_e: {np.isnan(all_incident_e).sum()}')
+            # print(f'Number of NAN values in total_shower_e: {np.isnan(total_shower_e).sum()}')
+            # print(f'Number of NAN values in n_hits: {np.isnan(n_hits).sum()}')
+            # print(f'Number of NAN values in nhits: {np.isnan(nhits).sum()}')
+            # print(f'Number of NAN values in all_x: {np.isnan(all_x).sum()}')
+            # print(f'Number of NAN values in all_y: {np.isnan(all_y).sum()}')
+            # print(f'Number of NAN values in all_z: {np.isnan(all_z).sum()}')
+            # print(f'Number of NAN values in all_e: {np.isnan(all_e).sum()}')
 
             
             bins = np.linspace(0,10,100)
