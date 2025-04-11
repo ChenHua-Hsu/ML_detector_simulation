@@ -362,7 +362,7 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
     
     n_files = len(files_list_)
     print(f'n_files: {n_files}')
-    nshowers_per_file = [1311,6685,774,613,615]
+    #nshowers_per_file = [1311,6685,774,613,615]
     #r_ = config.n_showers_2_gen % nshowers_per_file[0]
     #nshowers_per_file[-1] = nshowers_per_file[-1]+r_
     shower_counter = 0
@@ -392,6 +392,7 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
 
         # Load shower data
         custom_data = utils.cloud_dataset(file, device=device)
+        nshowers = len(custom_data) // 5
         point_clouds_loader = DataLoader(custom_data, batch_size=config.batch_size, shuffle=True)
         # Loop over batches
         for i, (shower_data, incident_energies) in enumerate(point_clouds_loader,0):
@@ -419,7 +420,7 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
                 incident_e_per_shower = np.append(incident_e_per_shower, energy_np[j])
 
                 # ONLY for plotting purposes
-                if shower_counter >= nshowers_per_file[file_idx]:
+                if shower_counter >= nshowers:
                     break
                 else:
                     shower_counter+=1
@@ -480,7 +481,7 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
         #fig0.savefig(savefigname)
 
         # Generate tensor sampled from the appropriate range of injection energies
-        in_energies = torch.from_numpy(np.random.choice( incident_e_per_shower, nshowers_per_file[file_idx] ))
+        in_energies = torch.from_numpy(np.random.choice( incident_e_per_shower, nshowers ))
         if file_idx == 0:
             sampled_ine = in_energies
         else:
