@@ -24,10 +24,10 @@ if __name__ == '__main__':
   parser = argparse.ArgumentParser(description=usage)
   parser.add_argument('--config_file', type=str, default = '/eos/user/c/chenhua/copy_tdsm_encoder_sweep16/configs/main_repository.yml',help = 'configuration file for wandb')
   parser.add_argument('--python_cfg', type=str, default = 'trans_tdsm_130_generate.py', help = 'python file to run the code')
-  parser.add_argument('--n_run', type=int, default = 5, help = 'number of runs')
+  parser.add_argument('--n_run', type=int, default = 100, help = 'number of runs')
   parser.add_argument('--dryRun', action='store_true', help = 'not submit to condor')
   parser.add_argument('--afs_dir', type=str, default = '/afs/cern.ch/user/c/chenhua', help='workspace in afs space')
-  parser.add_argument('--JobFlavour', type=str, default = 'nextweek', help='JobFlavour for condor')
+  parser.add_argument('--MaxRuntime', type=int, default = 1814400, help='JobFlavour for condor')
   args = parser.parse_args()
 
   # Read configuration file for sweep.
@@ -40,8 +40,8 @@ if __name__ == '__main__':
   sweep_yml['parameters']['work_dir'] = {'value': CWD}
   sweep_yml['parameters']['switches'] = {'value': '1110'}
   sweep_yml['parameters']['condor']   = {'value': 1}
-  sweep_yml['parameters']['inputs']= {'value': os.path.join(CWD, "fulldataset")}
-  sweep_yml['parameters']['preprocessor'] = {'value': os.path.join(CWD, "fulldataset/dataset_2_padded_transform_incident_later_nentry2065To2193_preprocessor.pkl")}
+  sweep_yml['parameters']['inputs']= {'value': os.path.join(CWD, "full_dataset_final_run")}
+  sweep_yml['parameters']['preprocessor'] = {'value': os.path.join(CWD, "full_dataset_final_run/dataset_2_padded_transform_incident_later_nentry2065To2193_preprocessor.pkl")}
 
 
   # Create necessary work space in afs space (condor can not be submitted from eos space)
@@ -64,7 +64,7 @@ if __name__ == '__main__':
   condor.write('log    = %s/job_common_$(Process).log\n'%farm_dir)
   condor.write('executable = %s/$(cfgFile)\n'%farm_dir)
   condor.write('request_GPUs = 1\n')
-  condor.write('+JobFlavour = "%s"\n'%args.JobFlavour)
+  condor.write('+MaxRuntime = %s\n' % args.MaxRuntime)
 
   # Create sweep project
   project_name = args.config_file.split('.')[0].split('_',1)[1].replace("/", "_")#args.config_file.split('.')[0].split('_',1)[1]
