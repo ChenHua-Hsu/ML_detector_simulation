@@ -116,7 +116,7 @@ def plot_loss_vs_epoch(eps_, train_losses, test_losses, odir='', zoom=False):
     
     return
 
-def plot_distribution(files_:Union[ list , utils.cloud_dataset], nshowers_2_plot=100, padding_value=0.0, batch_size=1, energy_trans=False, masking=True):
+def plot_distribution(files_:Union[ list , utils.cloud_dataset], nshowers, nshowers_2_plot=100, padding_value=0.0, batch_size=1, energy_trans=False, masking=True):
     
     '''
     files_ = can be a list of input files or a cloud dataset object
@@ -153,10 +153,10 @@ def plot_distribution(files_:Union[ list , utils.cloud_dataset], nshowers_2_plot
         # Using several files so want to take even # samples from each file for plots
         n_files = len(files_)
         print(f'# files: {n_files}')
-        nshowers_per_file = [1311,6685,774,613,615]
+        #nshowers_per_file = [1311,6685,774,613,615]
         #r_ = nshowers_2_plot % nshowers_per_file[0]
         #nshowers_per_file[-1] = nshowers_per_file[-1]+r_
-        print(f'# showers per file: {nshowers_per_file}')
+        print(f'# showers per file: {nshowers}')
         
         for file_idx in range(len(files_)):
             filename = files_[file_idx]
@@ -183,7 +183,7 @@ def plot_distribution(files_:Union[ list , utils.cloud_dataset], nshowers_2_plot
                 
                 # For each shower in batch
                 for j in range(len(data_np)):
-                    if shower_counter >= nshowers_per_file[file_idx]:
+                    if shower_counter >= (nshowers):
                         break
                     shower_counter+=1
                     
@@ -241,7 +241,7 @@ def plot_distribution(files_:Union[ list , utils.cloud_dataset], nshowers_2_plot
             mask = ~(data_np[:,:,0] == padding_value)
             # For each shower in batch
             for j in range(len(data_np)):
-                if shower_counter >= nshowers_2_plot:
+                if shower_counter >= (nshowers): #nshowers_2_plot
                     break
                     
                 shower_counter+=1
@@ -1043,35 +1043,37 @@ class High_class_feature_plot_test:
         self.z_bins = 45
         source_file = h5py.File(source_file, 'r')
         self.shower_gen, self.ine_gen = eib.extract_shower_and_energy(source_file, which='input')
+        ref_file = h5py.File(reference_files, 'r')
+        self.shower_ref, self.ine_ref = eib.extract_shower_and_energy(ref_file, which='input')
 
         # Initialize lists to store concatenated data and shower counts
         self.shower_ref_list = []
         self.ine_ref_list = []
         self.shower_nums = []
 
-        i = 0 
-        self.batches = [1311,6685,774,613,615]#[1311,615,613,774,6685,2]#[774,613,2,6685,615,1311]
-        # Load and concatenate all reference files, and keep track of shower counts
-        for ref_file in reference_files:
-            print(ref_file)
-            ref_file = h5py.File(ref_file, 'r')
-            shower_ref, ine_ref = eib.extract_shower_and_energy(ref_file, which='input')
-            batch = self.batches[i] 
-            self.shower_ref_list.append(shower_ref[:batch])
-            # if self.shower_ref_list[i] is torch.Tensor:
-            #print(self.shower_ref_list[i].shape())
-            self.ine_ref_list.append(ine_ref)
-            #self.shower_nums.append(self.batches[i])  # Store the number of showers for each reference fileq
-            print(self.batches[i])
-            print(self.batches)
-            print(batch)
-            print(i)
-            i += 1
-            #print(ref_file)
-            #print(self.batches[i])
-        # Concatenate the data from all reference files
-        self.shower_ref = np.concatenate(self.shower_ref_list, axis=0)
-        self.ine_ref = np.concatenate(self.ine_ref_list, axis=0)
+        # i = 0 
+        # self.batches = [1311,6685,774,613,615]#[1311,615,613,774,6685,2]#[774,613,2,6685,615,1311]
+        # # Load and concatenate all reference files, and keep track of shower counts
+        # for ref_file in reference_files:
+        #     print(ref_file)
+        #     ref_file = h5py.File(ref_file, 'r')
+        #     shower_ref, ine_ref = eib.extract_shower_and_energy(ref_file, which='input')
+        #     batch = self.batches[i] 
+        #     self.shower_ref_list.append(shower_ref[:batch])
+        #     # if self.shower_ref_list[i] is torch.Tensor:
+        #     #print(self.shower_ref_list[i].shape())
+        #     self.ine_ref_list.append(ine_ref)
+        #     #self.shower_nums.append(self.batches[i])  # Store the number of showers for each reference fileq
+        #     print(self.batches[i])
+        #     print(self.batches)
+        #     print(batch)
+        #     print(i)
+        #     i += 1
+        #     #print(ref_file)
+        #     #print(self.batches[i])
+        # # Concatenate the data from all reference files
+        # self.shower_ref = np.concatenate(self.shower_ref_list, axis=0)
+        # self.ine_ref = np.concatenate(self.ine_ref_list, axis=0)
 
         # Convert to NumPy arrays
         self.shower_gen = np.array(self.shower_gen)
@@ -1079,12 +1081,13 @@ class High_class_feature_plot_test:
 
         # Ensure the same number of showers in both gen and ref data
         self.shower_num = self.shower_gen.shape[0]
+        self.shower_ref = self.shower_ref.shape[0]
         #self.shower_gen = self.shower_gen[:self.shower_num]
         #self.shower_ref = self.shower_ref[:self.shower_num]
 
         # Reshape the data
         self.reshaped_shower_gen = self.shower_gen.reshape(self.shower_num, self.z_bins, self.theata_bins, self.r_bins)
-        self.reshaped_shower_ref = self.shower_ref.reshape(self.shower_num, self.z_bins, self.theata_bins, self.r_bins)
+        self.reshaped_shower_ref = self.shower_ref.reshape(self.shower_ref, self.z_bins, self.theata_bins, self.r_bins)
 
         self.output_dir = output_dir
 
