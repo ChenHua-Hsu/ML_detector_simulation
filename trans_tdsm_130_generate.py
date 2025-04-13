@@ -46,7 +46,7 @@ import sdes as sdes
 import display_remove_tail as display 
 import samplers as samplers
 import Convertor as Convertor
-from Convertor import Preprocessor
+from Convertor_final_quantile_xy import Preprocessor
 #import fid_score1 as fid_score1
 
 
@@ -541,9 +541,9 @@ def generate(files_list_, load_filename, device='cpu', serialized_model=False):
     elapsed_time = gen_end_time - gen_start_time
     gen_data = utils.cloud_dataset(sample_savename,device=device)
     # Generated distributions
-    dists_gen = display.plot_distribution(gen_data, nshowers_2_plot=config.n_showers_2_gen, padding_value=0.0)
+    dists_gen = display.plot_distribution(gen_data, nshowers, nshowers_2_plot=config.n_showers_2_gen, padding_value=0.0)
     # Distributions object for Geant4 files
-    dists = display.plot_distribution(files_list_, nshowers_2_plot=config.n_showers_2_gen, padding_value=0.0)
+    dists = display.plot_distribution(files_list_, nshowers, nshowers_2_plot=config.n_showers_2_gen, padding_value=0.0)
     comparison_fig = display.comparison_summary(dists, dists_gen, output_directory)#, erange=(-5,3), xrange=(-2.5,2.5), yrange=(-2.5,2.5), zrange=(0,1))
     # Add evaluation plots to keep on wandb
     #et_correlation_gen = display.correlation(dists_gen[3],dists_gen[5],output_directory)
@@ -738,7 +738,7 @@ def main(config=None):
         if switches_ & trigger:
             # Limited to n_showers_2_gen showers in for plots
             # Transformed variables
-            dists_trans = display.plot_distribution(files_list_, nshowers_2_plot=config.n_showers_2_gen, padding_value=padding_value)
+            dists_trans = display.plot_distribution(files_list_, nshowers, nshowers_2_plot=config.n_showers_2_gen, padding_value=padding_value)
             entries = dists_trans[0]
             all_incident_e_trans = dists_trans[1]
             total_deposited_e_shower_trans = dists_trans[2]
@@ -849,7 +849,8 @@ def main(config=None):
             plot_file_name = os.path.join(output_directory, 'sample.pt')
             custom_data = utils.cloud_dataset(plot_file_name,device=device)
             # when providing just cloud dataset, energy_trans_file needs to include full path
-            dists_gen = display.plot_distribution(custom_data, nshowers_2_plot=config.n_showers_2_gen, padding_value=padding_value)
+            nshowers = len(custom_data) // 5
+            dists_gen = display.plot_distribution(custom_data, nshowers, nshowers_2_plot=config.n_showers_2_gen, padding_value=padding_value)
 
             entries_gen = dists_gen[0]
             all_incident_e_gen = dists_gen[1]
@@ -864,7 +865,7 @@ def main(config=None):
 
             print(f'Geant4 inputs')
             # Distributions object for Geant4 files
-            dists = display.plot_distribution(files_list_, nshowers_2_plot=config.n_showers_2_gen, padding_value=padding_value)
+            dists = display.plot_distribution(files_list_, nshowers, nshowers_2_plot=config.n_showers_2_gen, padding_value=padding_value)
 
             entries = dists[0]
             all_incident_e = dists[1]
